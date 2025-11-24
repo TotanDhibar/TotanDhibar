@@ -95,7 +95,7 @@
                 <td><%= cert.description || '' %></td>
                 <td><%= new Date(cert.upload_date).toLocaleDateString() %></td>
                 <td>
-                  <button class="btn btn-small preview-btn" onclick="previewCertificate('<%= cert.file_path %>', '<%= cert.title %>')">Preview</button>
+                  <button class="btn btn-small preview-btn" data-filepath="<%= cert.file_path %>" data-title="<%= cert.title %>" onclick="previewCertificate(this.dataset.filepath, this.dataset.title)">Preview</button>
                   <a href="<%= cert.file_path %>" class="btn btn-small" target="_blank" download>Download</a>
                   <form method="POST" action="/admin/certificates/delete/<%= cert.id %>" style="display:inline;">
                     <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Delete?')">Delete</button>
@@ -125,9 +125,22 @@
 
   <script>
     function previewCertificate(filePath, title) {
+      // Validate file path - must start with /uploads/ and not contain path traversal
+      if (!filePath.startsWith('/uploads/') || filePath.includes('..')) {
+        alert('Invalid file path');
+        return;
+      }
+      
       document.getElementById('certificateTitle').textContent = title;
       
       const fileExt = filePath.split('.').pop().toLowerCase();
+      const allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+      
+      if (!allowedExtensions.includes(fileExt)) {
+        alert('Unsupported file type');
+        return;
+      }
+      
       const viewer = document.getElementById('pdfViewer');
       
       if (fileExt === 'pdf') {

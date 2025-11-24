@@ -135,22 +135,48 @@
   </div>
 
   <script>
-    const submissions = <%= JSON.stringify(submissions) %>;
+    const submissions = <%- JSON.stringify(submissions) %>;
     
     function showMessage(id) {
       const submission = submissions.find(s => s.id === id);
       if (!submission) return;
       
       const modalBody = document.getElementById('modalBody');
-      modalBody.innerHTML = `
-        <div class="submission-detail"><strong>Name:</strong> ${submission.name}</div>
-        <div class="submission-detail"><strong>Email:</strong> ${submission.email}</div>
-        <div class="submission-detail"><strong>Phone:</strong> ${submission.phone || 'N/A'}</div>
-        <div class="submission-detail"><strong>Subject:</strong> ${submission.subject}</div>
-        <div class="submission-detail"><strong>Date:</strong> ${new Date(submission.submitted_at).toLocaleString()}</div>
-        <div class="submission-detail"><strong>Message:</strong></div>
-        <div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px; white-space: pre-wrap;">${submission.message}</div>
-      `;
+      
+      // Safely create elements to avoid XSS
+      modalBody.innerHTML = '';
+      
+      const createDetail = (label, value) => {
+        const div = document.createElement('div');
+        div.className = 'submission-detail';
+        const strong = document.createElement('strong');
+        strong.textContent = label + ':';
+        div.appendChild(strong);
+        div.appendChild(document.createTextNode(' ' + value));
+        return div;
+      };
+      
+      modalBody.appendChild(createDetail('Name', submission.name));
+      modalBody.appendChild(createDetail('Email', submission.email));
+      modalBody.appendChild(createDetail('Phone', submission.phone || 'N/A'));
+      modalBody.appendChild(createDetail('Subject', submission.subject));
+      modalBody.appendChild(createDetail('Date', new Date(submission.submitted_at).toLocaleString()));
+      
+      const messageLabel = document.createElement('div');
+      messageLabel.className = 'submission-detail';
+      const messageLabelStrong = document.createElement('strong');
+      messageLabelStrong.textContent = 'Message:';
+      messageLabel.appendChild(messageLabelStrong);
+      modalBody.appendChild(messageLabel);
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.style.marginTop = '10px';
+      messageDiv.style.padding = '10px';
+      messageDiv.style.background = '#f5f5f5';
+      messageDiv.style.borderRadius = '5px';
+      messageDiv.style.whiteSpace = 'pre-wrap';
+      messageDiv.textContent = submission.message;
+      modalBody.appendChild(messageDiv);
       
       document.getElementById('messageModal').style.display = 'block';
     }

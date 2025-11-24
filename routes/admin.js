@@ -12,6 +12,11 @@ const fs = require('fs');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadType = req.body.uploadType || 'images';
+    // Validate uploadType to prevent path traversal
+    const allowedTypes = ['images', 'certificates'];
+    if (!allowedTypes.includes(uploadType)) {
+      return cb(new Error('Invalid upload type'));
+    }
     const dir = path.join(__dirname, '..', 'public', 'uploads', uploadType);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -19,8 +24,11 @@ const storage = multer.diskStorage({
     cb(null, dir);
   },
   filename: function (req, file, cb) {
+    // Sanitize the original filename to prevent path traversal
+    const sanitizedName = path.basename(file.originalname).replace(/[^a-zA-Z0-9.-]/g, '_');
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    const ext = path.extname(sanitizedName);
+    cb(null, uniqueSuffix + ext);
   }
 });
 
