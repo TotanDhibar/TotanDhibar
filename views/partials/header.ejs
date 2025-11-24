@@ -2,7 +2,11 @@
     <div class="container">
         <nav class="navbar">
             <div class="logo">
-                <h1>UCC Engineering</h1>
+                <% if (locals.contactInfo && contactInfo.company_logo) { %>
+                <a href="/"><img src="<%= contactInfo.company_logo %>" alt="<%= contactInfo.company_name || 'UCC Engineering' %>" class="logo-image"></a>
+                <% } else { %>
+                <h1><a href="/"><%= locals.contactInfo ? contactInfo.company_name : 'UCC Engineering' %></a></h1>
+                <% } %>
             </div>
             <button class="mobile-menu-toggle" aria-label="Toggle menu">
                 <span></span>
