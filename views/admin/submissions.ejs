@@ -135,7 +135,8 @@
   </div>
 
   <script>
-    const submissions = <%- JSON.stringify(submissions) %>;
+    // Safely embed JSON data by escaping special characters
+    const submissions = JSON.parse(decodeURIComponent("<%= encodeURIComponent(JSON.stringify(submissions)) %>"));
     
     function showMessage(id) {
       const submission = submissions.find(s => s.id === id);
