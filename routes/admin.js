@@ -726,6 +726,10 @@ router.get('/contact-info', requireAuth, (req, res) => {
 
 router.post('/contact-info',
   requireAuth,
+  upload.fields([
+    { name: 'company_logo', maxCount: 1 },
+    { name: 'background_image', maxCount: 1 }
+  ]),
   [
     body('company_name').trim().notEmpty().withMessage('Company name is required'),
     body('phone').optional().trim(),
@@ -747,17 +751,30 @@ router.post('/contact-info',
 
     try {
       const { company_name, phone, email, address, location } = req.body;
+      const contactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
+      
+      let company_logo = contactInfo ? contactInfo.company_logo : null;
+      let background_image = contactInfo ? contactInfo.background_image : null;
+      
+      if (req.files && req.files['company_logo']) {
+        company_logo = '/uploads/images/' + req.files['company_logo'][0].filename;
+      }
+      
+      if (req.files && req.files['background_image']) {
+        background_image = '/uploads/images/' + req.files['background_image'][0].filename;
+      }
+
       const stmt = db.prepare(`
         UPDATE contact_info 
-        SET company_name = ?, phone = ?, email = ?, address = ?, location = ?, updated_at = CURRENT_TIMESTAMP
+        SET company_name = ?, company_logo = ?, background_image = ?, phone = ?, email = ?, address = ?, location = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = 1
       `);
-      stmt.run(company_name, phone || null, email || null, address || null, location || null);
+      stmt.run(company_name, company_logo, background_image, phone || null, email || null, address || null, location || null);
 
-      const contactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
+      const updatedContactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
       res.render('admin/contact-info', {
         title: 'Edit Contact Information',
-        contactInfo,
+        contactInfo: updatedContactInfo,
         errors: [],
         success: true
       });

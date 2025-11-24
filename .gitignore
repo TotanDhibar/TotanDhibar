@@ -1,7 +1,8 @@
 node_modules/
 *.db
 .env
-public/uploads/
-!public/uploads/.gitkeep
+public/uploads/**/*
+!public/uploads/images/.gitkeep
+!public/uploads/certificates/.gitkeep
 .DS_Store
 npm-debug.log
