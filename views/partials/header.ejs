@@ -2,7 +2,7 @@
     <div class="container">
         <nav class="navbar">
             <div class="logo">
-                <% if (locals.contactInfo && contactInfo.company_logo) { %>
+                <% if (locals.contactInfo && contactInfo.company_logo && contactInfo.company_logo.startsWith('/uploads/')) { %>
                 <a href="/"><img src="<%= contactInfo.company_logo %>" alt="<%= contactInfo.company_name || 'UCC Engineering' %>" class="logo-image"></a>
                 <% } else { %>
                 <h1><a href="/"><%= locals.contactInfo ? contactInfo.company_name : 'UCC Engineering' %></a></h1>
