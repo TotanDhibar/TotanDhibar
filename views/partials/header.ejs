@@ -1,0 +1,22 @@
+<header class="site-header">
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">
+                <h1>UCC Engineering</h1>
+            </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="/" class="<%= title === 'Home' || title.includes('Welcome') ? 'active' : '' %>">Home</a></li>
+                <li><a href="/about" class="<%= title.includes('About') ? 'active' : '' %>">About</a></li>
+                <li><a href="/services" class="<%= title.includes('Services') ? 'active' : '' %>">Services</a></li>
+                <li><a href="/projects" class="<%= title.includes('Projects') || title.includes('Clients') ? 'active' : '' %>">Projects</a></li>
+                <li><a href="/certificates" class="<%= title.includes('Certificates') ? 'active' : '' %>">Certificates</a></li>
+                <li><a href="/contact" class="<%= title.includes('Contact') ? 'active' : '' %>">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>

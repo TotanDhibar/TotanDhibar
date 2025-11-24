@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - UCC Engineering</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header') %>
+    
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1><%= title %></h1>
+                <p>Our certifications and downloadable resources</p>
+            </div>
+        </section>
+
+        <% if (locals.certificates && certificates.length > 0) { %>
+        <section class="certificates-section">
+            <div class="container">
+                <h2>Our Certificates</h2>
+                <div class="certificates-list">
+                    <% certificates.forEach(cert => { %>
+                    <div class="certificate-card">
+                        <div class="certificate-icon">📄</div>
+                        <h3><%= cert.title %></h3>
+                        <% if (cert.description) { %>
+                        <p><%= cert.description %></p>
+                        <% } %>
+                        <a href="<%= cert.file_path %>" class="btn btn-small" target="_blank" download>Download PDF</a>
+                        <p class="upload-date">Uploaded: <%= new Date(cert.upload_date).toLocaleDateString() %></p>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+        </section>
+        <% } %>
+
+        <% if (locals.downloads && downloads.length > 0) { %>
+        <section class="downloads-section">
+            <div class="container">
+                <h2>Downloads</h2>
+                <div class="downloads-list">
+                    <% downloads.forEach(download => { %>
+                    <div class="download-card">
+                        <div class="download-icon">📁</div>
+                        <h3><%= download.title %></h3>
+                        <% if (download.category) { %>
+                        <span class="category-badge"><%= download.category %></span>
+                        <% } %>
+                        <% if (download.description) { %>
+                        <p><%= download.description %></p>
+                        <% } %>
+                        <a href="<%= download.file_path %>" class="btn btn-small" target="_blank" download>Download</a>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+        </section>
+        <% } %>
+    </main>
+    
+    <%- include('../partials/footer') %>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>UCC Engineering Contractors</h3>
+                <p>Professional power plant maintenance and engineering solutions.</p>
+            </div>
+            <% if (locals.contactInfo) { %>
+            <div class="footer-section">
+                <h4>Contact Us</h4>
+                <p><%= contactInfo.address %></p>
+                <p><%= contactInfo.location %></p>
+                <p>Phone: <%= contactInfo.phone %></p>
+                <p>Email: <%= contactInfo.email %></p>
+            </div>
+            <% } %>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/services">Services</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <%= new Date().getFullYear() %> UCC Engineering Contractors. All rights reserved.</p>
+        </div>
+    </div>
+</footer>

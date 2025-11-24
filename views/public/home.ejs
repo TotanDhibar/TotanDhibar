@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - UCC Engineering</title>
+    <% if (locals.page && locals.page.meta_description) { %>
+    <meta name="description" content="<%= page.meta_description %>">
+    <% } %>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header') %>
+    
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>UCC Engineering Contractors</h1>
+                <p class="hero-subtitle">Excellence in Power Plant Maintenance & Engineering</p>
+                <div class="hero-buttons">
+                    <a href="/services" class="btn btn-primary">Our Services</a>
+                    <a href="/contact" class="btn btn-secondary">Contact Us</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Section -->
+        <% if (locals.page) { %>
+        <section class="content-section">
+            <div class="container">
+                <%- page.content %>
+            </div>
+        </section>
+        <% } %>
+
+        <!-- Services Preview -->
+        <% if (locals.services && services.length > 0) { %>
+        <section class="services-preview">
+            <div class="container">
+                <h2>Our Core Services</h2>
+                <div class="services-grid">
+                    <% services.forEach(service => { %>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="icon-<%= service.icon || 'wrench' %>"></i>
+                        </div>
+                        <h3><%= service.name %></h3>
+                        <p><%= service.description %></p>
+                    </div>
+                    <% }); %>
+                </div>
+                <div class="text-center">
+                    <a href="/services" class="btn btn-primary">View All Services</a>
+                </div>
+            </div>
+        </section>
+        <% } %>
+
+        <!-- Clients Section -->
+        <% if (locals.clients && clients.length > 0) { %>
+        <section class="clients-section">
+            <div class="container">
+                <h2>Our Trusted Clients</h2>
+                <div class="clients-grid">
+                    <% clients.forEach(client => { %>
+                    <div class="client-card">
+                        <% if (client.logo) { %>
+                        <img src="<%= client.logo %>" alt="<%= client.name %>">
+                        <% } %>
+                        <h4><%= client.name %></h4>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+        </section>
+        <% } %>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Ready to Work With Us?</h2>
+                <p>Contact us today for professional engineering solutions</p>
+                <a href="/contact" class="btn btn-light">Get in Touch</a>
+            </div>
+        </section>
+    </main>
+    
+    <%- include('../partials/footer') %>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>

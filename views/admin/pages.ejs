@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+    <%- include('../partials/admin-header') %>
+    
+    <div class="admin-container">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <main class="admin-main">
+            <div class="admin-content">
+                <h1><%= title %></h1>
+                
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Page Name</th>
+                            <th>Title</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (locals.pages && pages.length > 0) { %>
+                            <% pages.forEach(page => { %>
+                            <tr>
+                                <td><%= page.page_name %></td>
+                                <td><%= page.title %></td>
+                                <td><%= new Date(page.updated_at).toLocaleDateString() %></td>
+                                <td>
+                                    <a href="/admin/pages/edit/<%= page.page_name %>" class="btn btn-small">Edit</a>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr><td colspan="4">No pages found</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
