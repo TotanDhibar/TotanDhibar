@@ -74,6 +74,8 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS contact_info (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     company_name TEXT NOT NULL,
+    company_logo TEXT,
+    background_image TEXT,
     phone TEXT,
     email TEXT,
     address TEXT,

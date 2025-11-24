@@ -12,6 +12,11 @@ const fs = require('fs');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadType = req.body.uploadType || 'images';
+    // Validate uploadType to prevent path traversal
+    const allowedTypes = ['images', 'certificates'];
+    if (!allowedTypes.includes(uploadType)) {
+      return cb(new Error('Invalid upload type'));
+    }
     const dir = path.join(__dirname, '..', 'public', 'uploads', uploadType);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -19,8 +24,11 @@ const storage = multer.diskStorage({
     cb(null, dir);
   },
   filename: function (req, file, cb) {
+    // Sanitize the original filename to prevent path traversal
+    const sanitizedName = path.basename(file.originalname).replace(/[^a-zA-Z0-9.-]/g, '_');
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    const ext = path.extname(sanitizedName);
+    cb(null, uniqueSuffix + ext);
   }
 });
 
@@ -726,6 +734,10 @@ router.get('/contact-info', requireAuth, (req, res) => {
 
 router.post('/contact-info',
   requireAuth,
+  upload.fields([
+    { name: 'company_logo', maxCount: 1 },
+    { name: 'background_image', maxCount: 1 }
+  ]),
   [
     body('company_name').trim().notEmpty().withMessage('Company name is required'),
     body('phone').optional().trim(),
@@ -747,17 +759,30 @@ router.post('/contact-info',
 
     try {
       const { company_name, phone, email, address, location } = req.body;
+      const contactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
+      
+      let company_logo = contactInfo ? contactInfo.company_logo : null;
+      let background_image = contactInfo ? contactInfo.background_image : null;
+      
+      if (req.files && req.files['company_logo']) {
+        company_logo = '/uploads/images/' + req.files['company_logo'][0].filename;
+      }
+      
+      if (req.files && req.files['background_image']) {
+        background_image = '/uploads/images/' + req.files['background_image'][0].filename;
+      }
+
       const stmt = db.prepare(`
         UPDATE contact_info 
-        SET company_name = ?, phone = ?, email = ?, address = ?, location = ?, updated_at = CURRENT_TIMESTAMP
+        SET company_name = ?, company_logo = ?, background_image = ?, phone = ?, email = ?, address = ?, location = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = 1
       `);
-      stmt.run(company_name, phone || null, email || null, address || null, location || null);
+      stmt.run(company_name, company_logo, background_image, phone || null, email || null, address || null, location || null);
 
-      const contactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
+      const updatedContactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
       res.render('admin/contact-info', {
         title: 'Edit Contact Information',
-        contactInfo,
+        contactInfo: updatedContactInfo,
         errors: [],
         success: true
       });
