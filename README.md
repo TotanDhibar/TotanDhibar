@@ -1,221 +1,267 @@
-# Totan Dhibar - Portfolio Website
+# UCC Engineering Contractors - CMS Website
 
-[![Deploy to GitHub Pages](https://github.com/TotanDhibar/TotanDhibar/actions/workflows/static.yml/badge.svg)](https://github.com/TotanDhibar/TotanDhibar/actions/workflows/static.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Website](https://img.shields.io/website?url=https%3A%2F%2FTotanDhibar.github.io%2FTotanDhibar%2F)](https://TotanDhibar.github.io/TotanDhibar/)
+A complete, full-stack Content Management System (CMS) website for UCC Engineering Contractors, specializing in power plant maintenance and engineering services.
 
-A modern, responsive portfolio website showcasing my skills, projects, and professional journey as a software developer and designer.
+## 🏭 About UCC Engineering Contractors
 
-## 🌐 Live Demo
+UCC Engineering Contractors is a professional engineering company based in Asansol, West Bengal, providing expert services in:
+- AMC (Annual Maintenance Contract)
+- Boiler Maintenance
+- ESP (Electrostatic Precipitator)
+- APH (Air Preheater)
+- AHP (Auxiliary Heating Plant)
+- Hoist Operations
+- Shutdown Services
+- Overhauling
 
-Visit the live website: **[https://TotanDhibar.github.io/TotanDhibar/](https://TotanDhibar.github.io/TotanDhibar/)**
+**Trusted by major clients:** WBPDCL, NTPC, NSPCL, DPL, DSTPS
+
+## 🚀 Technology Stack
+
+- **Backend:** Node.js with Express.js
+- **Database:** SQLite (easily upgradeable to MySQL)
+- **Template Engine:** EJS (Embedded JavaScript)
+- **Authentication:** bcryptjs with session management
+- **File Upload:** Multer
+- **Security:** CSRF protection, password hashing, input validation
+- **CSS:** Custom responsive CSS with mobile-first design
 
 ## ✨ Features
 
-### 🎨 Design & User Experience
-- **Modern, Clean Aesthetic** - Professional design with carefully crafted color schemes
-- **Responsive Design** - Mobile-first approach ensuring perfect display on all devices
-- **Dark/Light Theme Toggle** - User preference-based theme switching with system preference detection
-- **Smooth Animations** - Elegant transitions and micro-interactions throughout the site
-- **Accessibility Focused** - WCAG compliant design with keyboard navigation and screen reader support
+### Public Website
+- **Home Page** - Dynamic content with services and clients showcase
+- **About Us** - Company information and mission
+- **Services** - Comprehensive list of engineering services
+- **Projects & Clients** - Portfolio with client logos and project details
+- **Certificates & Downloads** - PDF certificates and downloadable documents
+- **Contact Form** - Functional contact form with validation
+- **Responsive Design** - Mobile-friendly industrial blue/white theme
 
-### 🚀 Technical Features
-- **Vanilla JavaScript** - No framework dependencies for optimal performance
-- **Modern CSS** - CSS Grid, Flexbox, custom properties, and advanced animations
-- **Progressive Web App Ready** - Service worker support for offline capabilities
-- **SEO Optimized** - Proper meta tags, semantic HTML, and search engine friendly structure
-- **Performance Optimized** - Lazy loading, optimized assets, and efficient code splitting
+### Admin Panel (CMS)
+- **Secure Login** - Password-protected admin access
+- **Dashboard** - Overview with statistics and recent submissions
+- **Page Management** - Edit home and about page content
+- **Services Management** - Add/Edit/Delete services
+- **Clients Management** - Manage client list with logo uploads
+- **Projects Management** - Add projects with images
+- **Certificates Upload** - Upload and manage PDF certificates
+- **Downloads Manager** - Manage downloadable documents
+- **Contact Info Editor** - Update company contact information
+- **Submissions Viewer** - View and manage contact form submissions
+- **Password Change** - Secure password update functionality
 
-### 📱 Interactive Components
-- **Animated Hero Section** - Dynamic typing animation and floating elements
-- **Smooth Scroll Navigation** - Seamless scrolling between sections with active link highlighting
-- **Project Showcase** - Interactive project cards with hover effects and technology tags
-- **Contact Form** - Functional contact form with validation and user feedback
-- **Mobile Navigation** - Hamburger menu with smooth animations for mobile devices
+## 📦 Installation
 
-## 🏗️ Project Structure
+### Prerequisites
+- Node.js (v14 or higher)
+- npm (Node Package Manager)
+
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com/TotanDhibar/TotanDhibar.git
+cd TotanDhibar
+```
+
+### Step 2: Install Dependencies
+```bash
+npm install
+```
+
+### Step 3: Initialize Database
+```bash
+npm run init-db
+```
+
+This will create the SQLite database with:
+- All necessary tables
+- Default admin user (username: `admin`, password: `admin123`)
+- Sample services and clients
+- Default contact information
+
+### Step 4: Start the Server
+```bash
+npm start
+```
+
+For development with auto-restart:
+```bash
+npm run dev
+```
+
+The server will start on `http://localhost:3000`
+
+## 🔐 Default Admin Credentials
+
+**IMPORTANT:** Change these credentials after first login!
+
+- **Username:** `admin`
+- **Password:** `admin123`
+- **Admin URL:** `http://localhost:3000/admin`
+
+## 📂 Project Structure
 
 ```
 TotanDhibar/
-├── index.html              # Main HTML file with semantic structure
-├── style.css               # Comprehensive CSS with modern styling
-├── script.js               # Interactive JavaScript functionality
-├── README.md               # Project documentation
-├── .github/
-│   └── workflows/
-│       └── static.yml      # GitHub Actions deployment workflow
-└── assets/                 # (Future) Static assets like images
+├── server/
+│   ├── database.js          # Database connection
+│   └── init-db.js           # Database initialization script
+├── routes/
+│   ├── public.js            # Public website routes
+│   └── admin.js             # Admin panel routes
+├── views/
+│   ├── public/              # Public page templates
+│   │   ├── home.ejs
+│   │   ├── about.ejs
+│   │   ├── services.ejs
+│   │   ├── projects.ejs
+│   │   ├── certificates.ejs
+│   │   └── contact.ejs
+│   ├── admin/               # Admin panel templates
+│   │   ├── login.ejs
+│   │   ├── dashboard.ejs
+│   │   ├── pages.ejs
+│   │   ├── services.ejs
+│   │   └── ...
+│   └── partials/            # Reusable template parts
+│       ├── header.ejs
+│       ├── footer.ejs
+│       ├── admin-header.ejs
+│       └── admin-sidebar.ejs
+├── public/
+│   ├── css/
+│   │   ├── style.css        # Main public styles
+│   │   └── admin.css        # Admin panel styles
+│   ├── js/
+│   │   └── main.js          # Frontend JavaScript
+│   └── uploads/             # Uploaded files (images, PDFs)
+│       ├── images/
+│       └── certificates/
+├── middleware/
+│   └── auth.js              # Authentication middleware
+├── server.js                # Main application file
+├── package.json             # Dependencies and scripts
+└── database.db              # SQLite database (created after init)
 ```
 
-## 🛠️ Technologies Used
-
-### Frontend
-- **HTML5** - Semantic markup with accessibility in mind
-- **CSS3** - Modern styling with custom properties, Grid, and Flexbox
-- **JavaScript ES6+** - Modern JavaScript with classes and modules
-- **Font Awesome** - Icon library for consistent iconography
-- **Google Fonts** - Typography with Inter and JetBrains Mono fonts
-
-### Development & Deployment
-- **GitHub Pages** - Static site hosting
-- **GitHub Actions** - Automated CI/CD pipeline
-- **Git** - Version control
-- **VS Code** - Development environment
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Web browser (Chrome, Firefox, Safari, Edge)
-- Git (for cloning)
-- Text editor (VS Code recommended)
-
-### Local Development
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/TotanDhibar/TotanDhibar.git
-   cd TotanDhibar
-   ```
-
-2. **Open in your browser**
-   ```bash
-   # Option 1: Direct file opening
-   open index.html
-   
-   # Option 2: Using Python's built-in server
-   python -m http.server 8000
-   # Then visit http://localhost:8000
-   
-   # Option 3: Using Node.js serve package
-   npx serve .
-   ```
-
-3. **Start developing**
-   - Edit `index.html` for content changes
-   - Modify `style.css` for styling updates
-   - Update `script.js` for functionality enhancements
-
-### Deployment
-
-The website automatically deploys to GitHub Pages when changes are pushed to the main branch, thanks to the GitHub Actions workflow.
-
-#### Manual Deployment Steps:
-1. Push changes to the main branch
-2. GitHub Actions will automatically build and deploy
-3. Visit `https://YourUsername.github.io/YourUsername/` to see changes
-
-## 📁 File Descriptions
-
-### `index.html`
-- **Purpose**: Main HTML file containing the complete website structure
-- **Features**: Semantic HTML5, meta tags for SEO, accessibility attributes
-- **Sections**: Navigation, Hero, About, Projects, Contact, Footer
-
-### `style.css`
-- **Purpose**: Complete styling for the website
-- **Features**: CSS custom properties, responsive design, animations, dark/light themes
-- **Organization**: Organized by components with clear commenting
-
-### `script.js`
-- **Purpose**: Interactive functionality and user experience enhancements
-- **Features**: Theme management, navigation, animations, form handling, accessibility
-- **Architecture**: Modular class-based structure for maintainability
-
-### `.github/workflows/static.yml`
-- **Purpose**: Automated deployment to GitHub Pages
-- **Features**: Triggers on push to main, builds and deploys static content
-- **Configuration**: Optimized for static sites with proper permissions
-
-## 🎨 Customization Guide
+## 🎨 Customization
 
 ### Changing Colors
-Edit the CSS custom properties in `style.css`:
+Edit `/public/css/style.css` and `/public/css/admin.css`:
+- Primary color: `#1e3a5f` (Dark blue)
+- Accent color: `#0066cc` (Light blue)
+- Text color: `#333`
 
-```css
-:root {
-  --color-primary: #6366f1;        /* Primary brand color */
-  --color-secondary: #06b6d4;      /* Secondary accent color */
-  --color-accent: #ec4899;         /* Accent color for highlights */
-  /* ... more color variables */
-}
-```
-
-### Adding New Sections
-1. Add HTML structure in `index.html`
-2. Add corresponding styles in `style.css`
-3. Update navigation links
-4. Add any required JavaScript functionality
+### Adding New Pages
+1. Create new EJS template in `views/public/`
+2. Add route in `routes/public.js`
+3. Add navigation link in `views/partials/header.ejs`
 
 ### Modifying Content
-- **Personal Information**: Update the hero section and about section
-- **Projects**: Modify the projects grid with your own work
-- **Contact Information**: Update contact details and social links
-- **Skills**: Edit the skills section with your technologies
+Use the admin panel at `/admin` to:
+- Edit page content (Home, About)
+- Manage services, clients, projects
+- Update contact information
 
-### Theme Customization
-The website supports both light and dark themes. Customize theme colors by modifying the CSS custom properties under `[data-theme="dark"]` selector.
+## 🔒 Security Features
 
-## 📱 Browser Support
+- **Password Hashing:** bcryptjs with salt rounds
+- **Session Management:** Secure session cookies
+- **CSRF Protection:** Token-based CSRF prevention
+- **Input Validation:** express-validator for all forms
+- **File Upload Security:** File type and size restrictions
+- **SQL Injection Prevention:** Parameterized queries with better-sqlite3
 
-- **Chrome** 88+
-- **Firefox** 85+
-- **Safari** 14+
-- **Edge** 88+
+## 📧 Contact Form
 
-## ♿ Accessibility Features
+The contact form automatically:
+- Validates all required fields
+- Stores submissions in database
+- Allows admin to view and manage submissions
+- Marks messages as read/unread
 
-- **Keyboard Navigation** - Full keyboard accessibility
-- **Screen Reader Support** - Proper ARIA labels and semantic HTML
-- **Color Contrast** - WCAG AA compliant color ratios
-- **Motion Preferences** - Respects `prefers-reduced-motion`
-- **Focus Management** - Clear focus indicators and logical tab order
+## 🗄️ Database Schema
 
-## 🔧 Performance Optimizations
+The SQLite database includes these tables:
+- `users` - Admin user accounts
+- `pages` - Dynamic page content
+- `services` - Service listings
+- `clients` - Client information
+- `projects` - Project portfolio
+- `certificates` - Uploaded certificates
+- `downloads` - Downloadable documents
+- `contact_info` - Company contact details
+- `contact_submissions` - Form submissions
 
-- **Lazy Loading** - Images and non-critical content load on demand
-- **Efficient CSS** - Optimized selectors and minimal reflows
-- **JavaScript Optimization** - Debounced scroll events and efficient DOM manipulation
-- **Font Loading** - Optimized web font loading strategies
-- **Minimal Dependencies** - Vanilla JavaScript reduces bundle size
+## 🚀 Deployment
 
-## 📈 SEO Features
+### Option 1: Traditional Hosting (VPS/Dedicated Server)
 
-- **Meta Tags** - Comprehensive meta tags for search engines
-- **Open Graph** - Social media sharing optimization
-- **Semantic HTML** - Proper heading hierarchy and semantic elements
-- **Fast Loading** - Optimized performance for better search rankings
-- **Mobile-Friendly** - Responsive design for mobile search optimization
+1. Upload files to server
+2. Install Node.js
+3. Run `npm install`
+4. Run `npm run init-db`
+5. Use PM2 for process management:
+```bash
+npm install -g pm2
+pm2 start server.js --name ucc-website
+pm2 save
+```
 
-## 🤝 Contributing
+### Option 2: Platform as a Service (Heroku, Railway, Render)
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+1. Create account on platform
+2. Connect GitHub repository
+3. Set build command: `npm install && npm run init-db`
+4. Set start command: `npm start`
+5. Deploy
 
-### Development Guidelines
-1. Follow existing code style and conventions
-2. Test changes across different browsers and devices
-3. Ensure accessibility standards are maintained
-4. Update documentation for significant changes
+### Environment Variables
+For production, consider setting:
+```
+NODE_ENV=production
+PORT=3000
+SESSION_SECRET=your-secret-key-here
+```
 
-## 📄 License
+## 🛠️ Maintenance
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Backup Database
+```bash
+cp database.db database.backup.db
+```
 
-## 👨‍💻 About Me
+### Reset Database
+```bash
+rm database.db
+npm run init-db
+```
 
-Hi! I'm Totan Dhibar, a passionate software developer and designer who loves creating innovative digital experiences. This portfolio represents my skills in modern web development and design.
+### Update Dependencies
+```bash
+npm update
+```
 
-### Connect with Me
-- **GitHub**: [@TotanDhibar](https://github.com/TotanDhibar)
-- **LinkedIn**: [Totan Dhibar](https://linkedin.com/in/totandhibar)
-- **Twitter**: [@TotanDhibar](https://twitter.com/totandhibar)
-- **Email**: totan.dhibar@example.com
+## 📝 License
 
-### Skills & Interests
-- 🌱 Currently learning advanced React patterns and cloud technologies
-- 👀 Interested in AI/ML, blockchain, and modern web technologies
-- 💞️ Looking to collaborate on open-source projects and innovative startups
-- ⚡ Fun fact: I enjoy solving coding challenges and contributing to the developer community
+MIT License - Feel free to use this project for your own purposes.
+
+## 👨‍💻 Support
+
+For issues or questions about this CMS:
+- Open an issue on GitHub
+- Contact: UCC Engineering Contractors
+
+## 🎯 Future Enhancements
+
+Potential additions:
+- Image gallery for projects
+- News/Blog section
+- Employee management
+- Equipment inventory tracking
+- Client portal
+- Email notifications for form submissions
+- Multi-user support with roles
 
 ---
 
-**Built with ❤️ using HTML, CSS, and JavaScript**
+**Built with ❤️ for UCC Engineering Contractors**

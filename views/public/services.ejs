@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - UCC Engineering</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header') %>
+    
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1><%= title %></h1>
+                <p>Comprehensive engineering solutions for power plants</p>
+            </div>
+        </section>
+
+        <section class="services-section">
+            <div class="container">
+                <div class="services-grid">
+                    <% if (locals.services && services.length > 0) { %>
+                        <% services.forEach(service => { %>
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="icon-<%= service.icon || 'wrench' %>"></i>
+                            </div>
+                            <h3><%= service.name %></h3>
+                            <p><%= service.description %></p>
+                        </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No services available at this time.</p>
+                    <% } %>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container">
+                <h2>Need Our Services?</h2>
+                <p>Contact us for a consultation</p>
+                <a href="/contact" class="btn btn-light">Get in Touch</a>
+            </div>
+        </section>
+    </main>
+    
+    <%- include('../partials/footer') %>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - UCC Engineering</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header') %>
+    
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1><%= title %></h1>
+                <p>Our work and valued partnerships</p>
+            </div>
+        </section>
+
+        <% if (locals.projects && projects.length > 0) { %>
+        <section class="projects-section">
+            <div class="container">
+                <h2>Our Projects</h2>
+                <div class="projects-grid">
+                    <% projects.forEach(project => { %>
+                    <div class="project-card">
+                        <% if (project.image) { %>
+                        <img src="<%= project.image %>" alt="<%= project.title %>">
+                        <% } %>
+                        <div class="project-content">
+                            <h3><%= project.title %></h3>
+                            <% if (project.client_name) { %>
+                            <p class="project-client">Client: <%= project.client_name %></p>
+                            <% } %>
+                            <p><%= project.description %></p>
+                            <% if (project.completion_date) { %>
+                            <p class="project-date">Completed: <%= new Date(project.completion_date).toLocaleDateString() %></p>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+        </section>
+        <% } %>
+
+        <% if (locals.clients && clients.length > 0) { %>
+        <section class="clients-section">
+            <div class="container">
+                <h2>Our Valued Clients</h2>
+                <div class="clients-list">
+                    <% clients.forEach(client => { %>
+                    <div class="client-card">
+                        <% if (client.logo) { %>
+                        <img src="<%= client.logo %>" alt="<%= client.name %>">
+                        <% } %>
+                        <h4><%= client.name %></h4>
+                        <p><%= client.description %></p>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+        </section>
+        <% } %>
+    </main>
+    
+    <%- include('../partials/footer') %>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>

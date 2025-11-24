@@ -1,0 +1,17 @@
+<aside class="admin-sidebar">
+    <nav>
+        <ul>
+            <li><a href="/admin/dashboard" class="<%= title.includes('Dashboard') ? 'active' : '' %>">📊 Dashboard</a></li>
+            <li><a href="/admin/pages" class="<%= title.includes('Pages') && !title.includes('Edit') ? 'active' : '' %>">📄 Pages</a></li>
+            <li><a href="/admin/services" class="<%= title.includes('Services') && !title.includes('Edit') && !title.includes('Add') ? 'active' : '' %>">🔧 Services</a></li>
+            <li><a href="/admin/clients" class="<%= title.includes('Clients') && !title.includes('Edit') && !title.includes('Add') ? 'active' : '' %>">👥 Clients</a></li>
+            <li><a href="/admin/projects" class="<%= title.includes('Projects') && !title.includes('Edit') && !title.includes('Add') ? 'active' : '' %>">📁 Projects</a></li>
+            <li><a href="/admin/certificates" class="<%= title.includes('Certificates') ? 'active' : '' %>">📜 Certificates</a></li>
+            <li><a href="/admin/downloads" class="<%= title.includes('Downloads') ? 'active' : '' %>">📥 Downloads</a></li>
+            <li><a href="/admin/contact-info" class="<%= title.includes('Contact Information') ? 'active' : '' %>">📞 Contact Info</a></li>
+            <li><a href="/admin/submissions" class="<%= title.includes('Submissions') ? 'active' : '' %>">✉️ Submissions</a></li>
+            <li><a href="/admin/change-password" class="<%= title.includes('Change Password') ? 'active' : '' %>">🔑 Change Password</a></li>
+            <li><a href="/" target="_blank">🌐 View Website</a></li>
+        </ul>
+    </nav>
+</aside>

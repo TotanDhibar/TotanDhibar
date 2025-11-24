@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+    <%- include('../partials/admin-header') %>
+    <div class="admin-container">
+        <%- include('../partials/admin-sidebar') %>
+        <main class="admin-main">
+            <div class="admin-content">
+                <h1><%= title %></h1>
+                <% if (locals.success && success) { %>
+                <div class="alert alert-success">Service saved successfully!</div>
+                <% } %>
+                <% if (locals.errors && errors.length > 0) { %>
+                <div class="alert alert-error">
+                    <ul><% errors.forEach(error => { %><li><%= error.msg %></li><% }); %></ul>
+                </div>
+                <% } %>
+                <form method="POST" class="admin-form">
+                    <div class="form-group">
+                        <label>Service Name *</label>
+                        <input type="text" name="name" value="<%= service ? service.name : '' %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" rows="5"><%= service ? service.description || '' : '' %></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Icon</label>
+                        <input type="text" name="icon" value="<%= service ? service.icon || '' : '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label>Order</label>
+                        <input type="number" name="order_index" value="<%= service ? service.order_index : 0 %>">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a href="/admin/services" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
