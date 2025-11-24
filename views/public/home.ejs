@@ -14,9 +14,15 @@
     
     <main>
         <!-- Hero Section -->
-        <section class="hero">
+        <% 
+        let heroStyle = '';
+        if (locals.contactInfo && contactInfo.background_image && contactInfo.background_image.startsWith('/uploads/')) {
+            heroStyle = 'background-image: linear-gradient(rgba(30, 58, 95, 0.8), rgba(30, 58, 95, 0.8)), url(\'' + contactInfo.background_image + '\');';
+        }
+        %>
+        <section class="hero"<% if (heroStyle) { %> style="<%= heroStyle %>"<% } %>>
             <div class="container">
-                <h1>UCC Engineering Contractors</h1>
+                <h1><%= locals.contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %></h1>
                 <p class="hero-subtitle">Excellence in Power Plant Maintenance & Engineering</p>
                 <div class="hero-buttons">
                     <a href="/services" class="btn btn-primary">Our Services</a>
