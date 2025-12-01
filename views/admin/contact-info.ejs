@@ -97,6 +97,24 @@
             <small>Go to Google Maps, find your location, click "Share" → "Embed a map" → Copy the HTML iframe code</small>
           </div>
           
+          <h3>📍 GPS Location (Alternative to Embed Code)</h3>
+          <p style="color: #666; margin-bottom: 15px;"><small>If you don't have an embed code, enter your GPS coordinates to display an interactive map on the contact page.</small></p>
+          
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label>Latitude</label>
+              <input type="number" step="any" name="gps_latitude" value="<%= contactInfo && contactInfo.gps_latitude ? contactInfo.gps_latitude : '' %>" placeholder="e.g., 23.6850" min="-90" max="90">
+              <small>Range: -90 to 90</small>
+            </div>
+            
+            <div class="form-group">
+              <label>Longitude</label>
+              <input type="number" step="any" name="gps_longitude" value="<%= contactInfo && contactInfo.gps_longitude ? contactInfo.gps_longitude : '' %>" placeholder="e.g., 86.9617" min="-180" max="180">
+              <small>Range: -180 to 180</small>
+            </div>
+          </div>
+          <small style="display: block; margin-bottom: 15px;">💡 <strong>Tip:</strong> Find your coordinates on <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Google Maps</a> - right-click on your location and copy the coordinates.</small>
+          
           <button type="submit" class="btn btn-primary">Save Changes</button>
         </form>
       </div>

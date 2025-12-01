@@ -794,7 +794,9 @@ router.post('/contact-info',
     body('address').optional().trim(),
     body('location').optional().trim(),
     body('gst_number').optional().trim(),
-    body('google_map_embed').optional().trim()
+    body('google_map_embed').optional().trim(),
+    body('gps_latitude').optional().isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
+    body('gps_longitude').optional().isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180')
   ],
   (req, res) => {
     const errors = validationResult(req);
@@ -809,7 +811,7 @@ router.post('/contact-info',
     }
 
     try {
-      const { company_name, phone, email, address, location, gst_number, google_map_embed } = req.body;
+      const { company_name, phone, email, address, location, gst_number, google_map_embed, gps_latitude, gps_longitude } = req.body;
       const contactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
       
       let company_logo = contactInfo ? contactInfo.company_logo : null;
@@ -825,10 +827,10 @@ router.post('/contact-info',
 
       const stmt = db.prepare(`
         UPDATE contact_info 
-        SET company_name = ?, company_logo = ?, background_image = ?, phone = ?, email = ?, address = ?, location = ?, gst_number = ?, google_map_embed = ?, updated_at = CURRENT_TIMESTAMP
+        SET company_name = ?, company_logo = ?, background_image = ?, phone = ?, email = ?, address = ?, location = ?, gst_number = ?, google_map_embed = ?, gps_latitude = ?, gps_longitude = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = 1
       `);
-      stmt.run(company_name, company_logo, background_image, phone || null, email || null, address || null, location || null, gst_number || null, google_map_embed || null);
+      stmt.run(company_name, company_logo, background_image, phone || null, email || null, address || null, location || null, gst_number || null, google_map_embed || null, gps_latitude || null, gps_longitude || null);
 
       const updatedContactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
       res.render('admin/contact-info', {

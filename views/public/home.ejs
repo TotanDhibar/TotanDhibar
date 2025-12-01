@@ -13,17 +13,40 @@
     <%- include('../partials/header', { contactInfo }) %>
     
     <main>
-        <!-- Hero Section with Dynamic Content -->
-        <% 
-        let heroStyle = '';
-        // Use hero background from home_config, fallback to contact_info background
-        let heroBackground = (homeConfig && homeConfig.hero_background) ? homeConfig.hero_background : (contactInfo && contactInfo.background_image);
-        if (heroBackground && heroBackground.startsWith('/uploads/')) {
-            heroStyle = 'background-image: linear-gradient(rgba(30, 58, 95, 0.85), rgba(30, 58, 95, 0.85)), url(\'' + heroBackground + '\');';
-        }
-        %>
-        <section class="hero"<% if (heroStyle) { %> style="<%= heroStyle %>"<% } %>>
-            <div class="container">
+        <!-- Hero Section with Background Image Slideshow -->
+        <section class="hero hero-slideshow">
+            <!-- Background Slideshow -->
+            <div class="hero-slides">
+                <%
+                // Get hero backgrounds - support multiple images separated by |
+                let heroBackgrounds = [];
+                if (homeConfig && homeConfig.hero_background) {
+                    heroBackgrounds = homeConfig.hero_background.split('|').filter(bg => bg.trim());
+                }
+                if (heroBackgrounds.length === 0 && contactInfo && contactInfo.background_image) {
+                    heroBackgrounds.push(contactInfo.background_image);
+                }
+                // Default placeholder backgrounds if none configured
+                if (heroBackgrounds.length === 0) {
+                    heroBackgrounds = ['/uploads/hero-slide-1.jpg', '/uploads/hero-slide-2.jpg', '/uploads/hero-slide-3.jpg'];
+                }
+                %>
+                <% heroBackgrounds.forEach(function(bg, index) { %>
+                <div class="hero-slide<%= index === 0 ? ' active' : '' %>" style="background-image: url('<%= bg.trim() %>');" data-slide="<%= index %>"></div>
+                <% }); %>
+                <div class="hero-overlay"></div>
+            </div>
+            
+            <!-- Slideshow Navigation Dots -->
+            <% if (heroBackgrounds.length > 1) { %>
+            <div class="hero-dots">
+                <% heroBackgrounds.forEach(function(bg, index) { %>
+                <button class="hero-dot<%= index === 0 ? ' active' : '' %>" data-slide="<%= index %>" aria-label="Go to slide <%= index + 1 %>"></button>
+                <% }); %>
+            </div>
+            <% } %>
+            
+            <div class="container hero-content">
                 <h1 class="hero-title animate-fade-in">
                     <%= (homeConfig && homeConfig.hero_title) ? homeConfig.hero_title : (contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors') %>
                 </h1>

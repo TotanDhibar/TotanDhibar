@@ -159,6 +159,17 @@ try {
     console.log('Created session_log table');
   }
 
+  // Add GPS coordinates columns to contact_info for company location
+  if (!columnExists('contact_info', 'gps_latitude')) {
+    db.prepare('ALTER TABLE contact_info ADD COLUMN gps_latitude REAL').run();
+    console.log('Added gps_latitude column to contact_info table');
+  }
+  
+  if (!columnExists('contact_info', 'gps_longitude')) {
+    db.prepare('ALTER TABLE contact_info ADD COLUMN gps_longitude REAL').run();
+    console.log('Added gps_longitude column to contact_info table');
+  }
+
   console.log('All migrations completed successfully!');
 } catch (err) {
   console.error('Migration error:', err);

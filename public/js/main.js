@@ -1,9 +1,71 @@
 /**
  * Main JavaScript for UCC Engineering CMS Website
- * Includes animations, counters, lightbox, and interactive features
+ * Includes animations, counters, lightbox, slideshow, and interactive features
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // ===== HERO SLIDESHOW =====
+    const heroSlides = document.querySelectorAll('.hero-slide');
+    const heroDots = document.querySelectorAll('.hero-dot');
+    let currentSlide = 0;
+    let slideInterval;
+    const slideDelay = 5000; // 5 seconds between slides
+    
+    function showSlide(index) {
+        if (heroSlides.length <= 1) return;
+        
+        // Remove active class from all slides and dots
+        heroSlides.forEach(slide => {
+            slide.classList.remove('active');
+            slide.style.transform = 'scale(1)';
+        });
+        heroDots.forEach(dot => dot.classList.remove('active'));
+        
+        // Ensure index wraps around
+        currentSlide = (index + heroSlides.length) % heroSlides.length;
+        
+        // Add active class to current slide and dot
+        heroSlides[currentSlide].classList.add('active');
+        if (heroDots[currentSlide]) {
+            heroDots[currentSlide].classList.add('active');
+        }
+    }
+    
+    function nextSlide() {
+        showSlide(currentSlide + 1);
+    }
+    
+    function startSlideshow() {
+        if (heroSlides.length > 1) {
+            slideInterval = setInterval(nextSlide, slideDelay);
+        }
+    }
+    
+    function stopSlideshow() {
+        clearInterval(slideInterval);
+    }
+    
+    // Initialize slideshow if slides exist
+    if (heroSlides.length > 0) {
+        startSlideshow();
+        
+        // Add click handlers to dots
+        heroDots.forEach((dot, index) => {
+            dot.addEventListener('click', function() {
+                stopSlideshow();
+                showSlide(index);
+                startSlideshow();
+            });
+        });
+        
+        // Pause slideshow on hover
+        const heroSection = document.querySelector('.hero-slideshow');
+        if (heroSection) {
+            heroSection.addEventListener('mouseenter', stopSlideshow);
+            heroSection.addEventListener('mouseleave', startSlideshow);
+        }
+    }
     
     // ===== MOBILE MENU TOGGLE =====
     const mobileToggle = document.querySelector('.mobile-menu-toggle');
