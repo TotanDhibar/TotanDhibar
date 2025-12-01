@@ -1,3 +1,15 @@
+<%
+// EDIT HERE: HTML escape helper function for XSS prevention
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+%>
 <%- include('layout', {
     title: title,
     body: `
@@ -41,20 +53,20 @@
                     <tr>
                         <td>${index + 1}</td>
                         <td>
-                            <strong>${service.name}</strong>
+                            <strong>${escapeHtml(service.name)}</strong>
                             ${service.image ? '<br><small class="text-muted"><i class="fas fa-image"></i> Has image</small>' : ''}
                         </td>
-                        <td>${service.description ? (service.description.length > 60 ? service.description.substring(0, 60) + '...' : service.description) : '<span class="text-muted">No description</span>'}</td>
-                        <td><span class="badge badge-info">${service.order_index}</span></td>
+                        <td>${service.description ? escapeHtml(service.description.length > 60 ? service.description.substring(0, 60) + '...' : service.description) : '<span class="text-muted">No description</span>'}</td>
+                        <td><span class="badge badge-info">${parseInt(service.order_index) || 0}</span></td>
                         <td>
                             <div class="btn-group">
-                                <a href="/admin/services/edit/${service.id}" class="btn btn-sm btn-info" title="Edit">
+                                <a href="/admin/services/edit/${parseInt(service.id)}" class="btn btn-sm btn-info" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="/services/${service.slug}" class="btn btn-sm btn-secondary" title="View" target="_blank">
+                                <a href="/services/${encodeURIComponent(service.slug)}" class="btn btn-sm btn-secondary" title="View" target="_blank">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <form method="POST" action="/admin/services/delete/${service.id}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this service?');">
+                                <form method="POST" action="/admin/services/delete/${parseInt(service.id)}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this service?');">
                                     <button type="submit" class="btn btn-sm btn-danger" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>

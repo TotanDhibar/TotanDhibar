@@ -1,3 +1,15 @@
+<%
+// EDIT HERE: HTML escape helper function for XSS prevention
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+%>
 <%- include('layout', {
     title: title,
     body: `
@@ -49,27 +61,34 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
+                                <th style="width: 80px">Preview</th>
                                 <th>Title</th>
                                 <th>Description</th>
                                 <th>Upload Date</th>
-                                <th style="width: 200px">Actions</th>
+                                <th style="width: 180px">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
 ` + (certificates && certificates.length > 0 ? certificates.map(cert => `
                             <tr>
-                                <td><strong>${cert.title}</strong></td>
-                                <td>${cert.description || '<span class="text-muted">No description</span>'}</td>
+                                <td>
+                                    ${cert.file_path && !cert.file_path.endsWith('.pdf') ? 
+                                        '<img src="' + encodeURI(cert.file_path) + '" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;" onclick="previewCertificate(\\'' + encodeURI(cert.file_path) + '\\', \\'' + escapeHtml(cert.title).replace(/'/g, "\\\\'") + '\\')" title="Click to preview">' : 
+                                        '<div class="bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; cursor: pointer;" onclick="previewCertificate(\\'' + encodeURI(cert.file_path) + '\\', \\'' + escapeHtml(cert.title).replace(/'/g, "\\\\'") + '\\')"><i class="fas fa-file-pdf fa-2x text-white"></i></div>'
+                                    }
+                                </td>
+                                <td><strong>${escapeHtml(cert.title)}</strong></td>
+                                <td>${cert.description ? escapeHtml(cert.description) : '<span class="text-muted">No description</span>'}</td>
                                 <td><small>${new Date(cert.upload_date).toLocaleDateString()}</small></td>
                                 <td>
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-info" onclick="previewCertificate('${cert.file_path}', '${cert.title}')" title="Preview">
-                                            <i class="fas fa-eye"></i>
+                                        <button type="button" class="btn btn-sm btn-info" onclick="previewCertificate('${encodeURI(cert.file_path)}', '${escapeHtml(cert.title).replace(/'/g, "\\'")}')" title="Preview Full Quality">
+                                            <i class="fas fa-search-plus"></i>
                                         </button>
-                                        <a href="${cert.file_path}" class="btn btn-sm btn-secondary" target="_blank" download title="Download">
+                                        <a href="${encodeURI(cert.file_path)}" class="btn btn-sm btn-secondary" target="_blank" download title="Download">
                                             <i class="fas fa-download"></i>
                                         </a>
-                                        <form method="POST" action="/admin/certificates/delete/${cert.id}" style="display:inline;" onsubmit="return confirm('Delete this certificate?');">
+                                        <form method="POST" action="/admin/certificates/delete/${parseInt(cert.id)}" style="display:inline;" onsubmit="return confirm('Delete this certificate?');">
                                             <button type="submit" class="btn btn-sm btn-danger" title="Delete">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -77,7 +96,7 @@
                                     </div>
                                 </td>
                             </tr>
-`).join('') : '<tr><td colspan="4" class="text-center text-muted p-4">No certificates uploaded yet</td></tr>') + `
+`).join('') : '<tr><td colspan="5" class="text-center text-muted p-4">No certificates uploaded yet</td></tr>') + `
                         </tbody>
                     </table>
                 </div>
@@ -88,25 +107,63 @@
         </div>
     </div>
     
-    <!-- EDIT HERE: Certificate Preview Modal -->
-    <div class="modal fade" id="certificateModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="certificateTitle">Certificate Preview</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    <!-- EDIT HERE: Full Quality Certificate Preview Modal -->
+    <div class="modal fade" id="certificateModal" tabindex="-1" role="dialog" aria-labelledby="certificateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document" style="max-width: 95vw;">
+            <div class="modal-content" style="background: rgba(0,0,0,0.95);">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-white" id="certificateTitle">Certificate Preview</h5>
+                    <div class="ml-auto">
+                        <a href="#" id="downloadLink" class="btn btn-outline-light btn-sm mr-2" download>
+                            <i class="fas fa-download mr-1"></i> Download
+                        </a>
+                        <a href="#" id="openNewTabLink" class="btn btn-outline-light btn-sm mr-2" target="_blank">
+                            <i class="fas fa-external-link-alt mr-1"></i> Open in New Tab
+                        </a>
+                        <button type="button" class="btn btn-outline-light btn-sm" data-dismiss="modal" aria-label="Close">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="modal-body p-0" style="height: 75vh;">
-                    <iframe id="pdfViewer" src="" style="width: 100%; height: 100%; border: none;"></iframe>
-                    <img id="imageViewer" src="" style="width: 100%; max-height: 100%; object-fit: contain; display: none;">
+                <div class="modal-body text-center p-2" style="height: 85vh; overflow: auto;">
+                    <!-- EDIT HERE: PDF Viewer for full quality -->
+                    <iframe id="pdfViewer" src="" style="width: 100%; height: 100%; border: none; background: white;"></iframe>
+                    <!-- EDIT HERE: Image Viewer for full quality - no compression, natural size -->
+                    <img id="imageViewer" src="" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;" alt="Certificate Preview">
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle mr-1"></i> 
+                        Displaying full quality image. Use zoom controls in your browser for detailed view.
+                    </small>
                 </div>
             </div>
         </div>
     </div>
     `,
     extraScripts: `
+    <style>
+        /* EDIT HERE: Custom styles for full quality image preview */
+        #certificateModal .modal-body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #imageViewer {
+            /* Ensure image displays at full quality without any CSS scaling artifacts */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        /* Zoom controls for better viewing */
+        #certificateModal .modal-body:hover #imageViewer {
+            cursor: zoom-in;
+        }
+        #imageViewer.zoomed {
+            max-width: none;
+            max-height: none;
+            cursor: zoom-out;
+        }
+    </style>
     <script>
         // EDIT HERE: Custom file input label update
         document.querySelector('.custom-file-input').addEventListener('change', function(e) {
@@ -114,18 +171,20 @@
             e.target.nextElementSibling.textContent = fileName;
         });
         
-        // EDIT HERE: Preview certificate function
+        // EDIT HERE: Preview certificate function with full quality image support
         function previewCertificate(filePath, title) {
-            // Validate file path
+            // Validate file path - must start with /uploads/ and not contain path traversal
             if (!filePath.startsWith('/uploads/') || filePath.includes('..')) {
                 alert('Invalid file path');
                 return;
             }
             
             document.getElementById('certificateTitle').textContent = title;
+            document.getElementById('downloadLink').href = filePath;
+            document.getElementById('openNewTabLink').href = filePath;
             
             var fileExt = filePath.split('.').pop().toLowerCase();
-            var allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'webp'];
+            var allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp'];
             
             if (!allowedExtensions.includes(fileExt)) {
                 alert('Unsupported file type');
@@ -135,22 +194,45 @@
             var pdfViewer = document.getElementById('pdfViewer');
             var imageViewer = document.getElementById('imageViewer');
             
+            // Reset zoom state
+            imageViewer.classList.remove('zoomed');
+            
             if (fileExt === 'pdf') {
+                // Show PDF in iframe
                 pdfViewer.src = filePath;
                 pdfViewer.style.display = 'block';
                 imageViewer.style.display = 'none';
             } else {
-                imageViewer.src = filePath;
-                imageViewer.style.display = 'block';
-                pdfViewer.style.display = 'none';
+                // Show image at full quality
+                // Create new Image to ensure full quality load
+                var img = new Image();
+                img.onload = function() {
+                    imageViewer.src = filePath;
+                    imageViewer.style.display = 'block';
+                    pdfViewer.style.display = 'none';
+                };
+                img.src = filePath;
             }
             
             $('#certificateModal').modal('show');
         }
         
+        // EDIT HERE: Toggle zoom on image click for detailed view
+        document.getElementById('imageViewer').addEventListener('click', function() {
+            this.classList.toggle('zoomed');
+            if (this.classList.contains('zoomed')) {
+                // When zoomed, allow scrolling to see full image
+                this.parentElement.style.overflow = 'auto';
+            } else {
+                this.parentElement.style.overflow = 'auto';
+            }
+        });
+        
+        // EDIT HERE: Reset on modal close
         $('#certificateModal').on('hidden.bs.modal', function() {
             document.getElementById('pdfViewer').src = '';
             document.getElementById('imageViewer').src = '';
+            document.getElementById('imageViewer').classList.remove('zoomed');
         });
     </script>
     `

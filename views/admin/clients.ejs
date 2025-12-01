@@ -1,3 +1,15 @@
+<%
+// EDIT HERE: HTML escape helper function for XSS prevention
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+%>
 <%- include('layout', {
     title: title,
     body: `
@@ -40,23 +52,23 @@
 ` + (clients && clients.length > 0 ? clients.map(client => `
                     <tr>
                         <td>
-                            ${client.logo ? '<img src="' + client.logo + '" class="img-thumbnail" style="max-width:60px; max-height:60px;">' : '<span class="badge badge-secondary">No Logo</span>'}
+                            ${client.logo ? '<img src="' + encodeURI(client.logo) + '" class="img-thumbnail" style="max-width:60px; max-height:60px;" alt="' + escapeHtml(client.name) + '">' : '<span class="badge badge-secondary">No Logo</span>'}
                         </td>
                         <td>
-                            <strong>${client.name}</strong>
-                            ${client.website ? '<br><small class="text-muted"><i class="fas fa-globe"></i> <a href="' + client.website + '" target="_blank">Website</a></small>' : ''}
+                            <strong>${escapeHtml(client.name)}</strong>
+                            ${client.website ? '<br><small class="text-muted"><i class="fas fa-globe"></i> <a href="' + encodeURI(client.website) + '" target="_blank" rel="noopener noreferrer">Website</a></small>' : ''}
                         </td>
-                        <td>${client.description ? (client.description.length > 50 ? client.description.substring(0, 50) + '...' : client.description) : '<span class="text-muted">No description</span>'}</td>
-                        <td><span class="badge badge-info">${client.order_index}</span></td>
+                        <td>${client.description ? escapeHtml(client.description.length > 50 ? client.description.substring(0, 50) + '...' : client.description) : '<span class="text-muted">No description</span>'}</td>
+                        <td><span class="badge badge-info">${parseInt(client.order_index) || 0}</span></td>
                         <td>
                             <div class="btn-group">
-                                <a href="/admin/clients/edit/${client.id}" class="btn btn-sm btn-info" title="Edit">
+                                <a href="/admin/clients/edit/${parseInt(client.id)}" class="btn btn-sm btn-info" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="/clients/${client.slug}" class="btn btn-sm btn-secondary" title="View" target="_blank">
+                                <a href="/clients/${encodeURIComponent(client.slug)}" class="btn btn-sm btn-secondary" title="View" target="_blank">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <form method="POST" action="/admin/clients/delete/${client.id}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this client?');">
+                                <form method="POST" action="/admin/clients/delete/${parseInt(client.id)}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this client?');">
                                     <button type="submit" class="btn btn-sm btn-danger" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>

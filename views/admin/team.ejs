@@ -1,3 +1,15 @@
+<%
+// EDIT HERE: HTML escape helper function for XSS prevention
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+%>
 <%- include('layout', {
     title: title,
     body: `
@@ -22,37 +34,37 @@
                     <div class="card card-widget widget-user-2 shadow-sm">
                         <div class="widget-user-header bg-primary">
                             ${member.photo ? 
-                                '<img class="img-circle elevation-2" src="' + member.photo + '" alt="' + member.name + '" style="width: 60px; height: 60px; object-fit: cover; float: left; margin-right: 15px;">' : 
-                                '<div class="img-circle elevation-2 bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; float: left; margin-right: 15px; font-size: 1.5rem; color: white;">' + member.name.charAt(0) + '</div>'
+                                '<img class="img-circle elevation-2" src="' + encodeURI(member.photo) + '" alt="' + escapeHtml(member.name) + '" style="width: 60px; height: 60px; object-fit: cover; float: left; margin-right: 15px;">' : 
+                                '<div class="img-circle elevation-2 bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; float: left; margin-right: 15px; font-size: 1.5rem; color: white;">' + escapeHtml(member.name.charAt(0)) + '</div>'
                             }
-                            <h3 class="widget-user-username" style="margin-bottom: 0; margin-left: 75px;">${member.name}</h3>
-                            <h5 class="widget-user-desc" style="margin-left: 75px; font-size: 0.9rem;">${member.position || 'Team Member'}</h5>
+                            <h3 class="widget-user-username" style="margin-bottom: 0; margin-left: 75px;">${escapeHtml(member.name)}</h3>
+                            <h5 class="widget-user-desc" style="margin-left: 75px; font-size: 0.9rem;">${escapeHtml(member.position || 'Team Member')}</h5>
                         </div>
                         <div class="card-footer p-0">
                             <ul class="nav flex-column">
                                 <li class="nav-item">
                                     <span class="nav-link">
-                                        <i class="fas fa-envelope text-muted mr-1"></i> ${member.email || 'No email'}
+                                        <i class="fas fa-envelope text-muted mr-1"></i> ${escapeHtml(member.email || 'No email')}
                                     </span>
                                 </li>
                                 <li class="nav-item">
                                     <span class="nav-link">
-                                        <i class="fas fa-phone text-muted mr-1"></i> ${member.phone || 'No phone'}
+                                        <i class="fas fa-phone text-muted mr-1"></i> ${escapeHtml(member.phone || 'No phone')}
                                     </span>
                                 </li>
                                 <li class="nav-item">
                                     <span class="nav-link">
-                                        <i class="fas fa-sort-numeric-up text-muted mr-1"></i> Order: ${member.order_index}
+                                        <i class="fas fa-sort-numeric-up text-muted mr-1"></i> Order: ${parseInt(member.order_index) || 0}
                                     </span>
                                 </li>
                             </ul>
                         </div>
                         <div class="card-footer">
                             <div class="btn-group btn-block">
-                                <a href="/admin/team/edit/${member.id}" class="btn btn-sm btn-info">
+                                <a href="/admin/team/edit/${parseInt(member.id)}" class="btn btn-sm btn-info">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <form method="POST" action="/admin/team/delete/${member.id}" style="display:inline;" onsubmit="return confirm('Delete this team member?');">
+                                <form method="POST" action="/admin/team/delete/${parseInt(member.id)}" style="display:inline;" onsubmit="return confirm('Delete this team member?');">
                                     <button type="submit" class="btn btn-sm btn-danger">
                                         <i class="fas fa-trash"></i> Delete
                                     </button>

@@ -1,3 +1,15 @@
+<%
+// EDIT HERE: HTML escape helper function for XSS prevention
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+%>
 <%- include('layout', {
     title: title,
     body: `
@@ -31,25 +43,25 @@
 ` + (projects && projects.length > 0 ? projects.map(p => `
                 <div class="col-md-4 col-sm-6 project-item">
                     <div class="card">
-                        ${p.image ? '<img class="card-img-top" src="' + p.image + '" alt="' + p.title + '" style="height: 180px; object-fit: cover;">' : '<div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 180px;"><i class="fas fa-image fa-3x text-white-50"></i></div>'}
+                        ${p.image ? '<img class="card-img-top" src="' + encodeURI(p.image) + '" alt="' + escapeHtml(p.title) + '" style="height: 180px; object-fit: cover;">' : '<div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 180px;"><i class="fas fa-image fa-3x text-white-50"></i></div>'}
                         <div class="card-body">
-                            <h5 class="card-title">${p.title}</h5>
+                            <h5 class="card-title">${escapeHtml(p.title)}</h5>
                             <p class="card-text">
                                 <small class="text-muted">
-                                    <i class="fas fa-building mr-1"></i> ${p.client_name || 'No Client'}
+                                    <i class="fas fa-building mr-1"></i> ${escapeHtml(p.client_name || 'No Client')}
                                 </small><br>
                                 <small class="text-muted">
                                     <i class="fas fa-calendar mr-1"></i> ${p.completion_date ? new Date(p.completion_date).toLocaleDateString() : 'No Date'}
                                 </small>
-                                ${p.category ? '<br><span class="badge badge-info"><i class="fas fa-tag"></i> ' + p.category + '</span>' : ''}
+                                ${p.category ? '<br><span class="badge badge-info"><i class="fas fa-tag"></i> ' + escapeHtml(p.category) + '</span>' : ''}
                             </p>
                         </div>
                         <div class="card-footer">
                             <div class="btn-group btn-block">
-                                <a href="/admin/projects/edit/${p.id}" class="btn btn-sm btn-info">
+                                <a href="/admin/projects/edit/${parseInt(p.id)}" class="btn btn-sm btn-info">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <form method="POST" action="/admin/projects/delete/${p.id}" style="display:inline;" onsubmit="return confirm('Delete this project?');">
+                                <form method="POST" action="/admin/projects/delete/${parseInt(p.id)}" style="display:inline;" onsubmit="return confirm('Delete this project?');">
                                     <button type="submit" class="btn btn-sm btn-danger">
                                         <i class="fas fa-trash"></i> Delete
                                     </button>
