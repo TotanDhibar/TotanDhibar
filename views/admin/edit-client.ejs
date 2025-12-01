@@ -1,82 +1,95 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/admin.css">
-</head>
-<body class="admin-body">
-    <%- include('../partials/admin-header') %>
-    <div class="admin-container">
-        <%- include('../partials/admin-sidebar') %>
-        <main class="admin-main">
-            <div class="admin-content">
-                <div class="content-header">
-                    <h1><%= title %></h1>
-                    <a href="/admin/clients" class="btn btn-secondary">← Back to Clients</a>
-                </div>
-                
-                <% if (success) { %>
-                <div class="alert alert-success">Client saved successfully!</div>
-                <% } %>
-                
-                <% if (errors && errors.length > 0) { %>
-                <div class="alert alert-error">
-                    <ul><% errors.forEach(function(e) { %><li><%= e.msg %></li><% }); %></ul>
-                </div>
-                <% } %>
-                
-                <form method="POST" enctype="multipart/form-data" class="admin-form">
-                    <input type="hidden" name="uploadType" value="images">
-                    
-                    <div class="form-group">
-                        <label>Client Name *</label>
-                        <input type="text" name="name" value="<%= client ? client.name : '' %>" required>
-                        <small>This will also be used to generate the URL slug</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Short Description</label>
-                        <textarea name="description" rows="3" placeholder="Brief description for client cards"><%= client ? client.description || '' : '' %></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Detailed Description (HTML allowed)</label>
-                        <textarea name="detailed_description" rows="8" placeholder="Full description for the client detail page. You can use HTML tags."><%= client ? client.detailed_description || '' : '' %></textarea>
-                        <small>This content will appear on the client detail page. You can include HTML formatting.</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Website URL</label>
-                        <input type="url" name="website" value="<%= client ? client.website || '' : '' %>" placeholder="https://www.example.com">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Logo</label>
-                        <% if (client && client.logo) { %>
-                        <div style="margin-bottom: 10px;">
-                            <img src="<%= client.logo %>" alt="Current logo" style="max-width: 150px; border-radius: 8px; border: 1px solid #ddd; padding: 5px;">
-                        </div>
-                        <% } %>
-                        <input type="file" name="logo" accept="image/*">
-                        <small>Recommended: PNG with transparent background, 200x200px</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Display Order</label>
-                        <input type="number" name="order_index" value="<%= client ? client.order_index : 0 %>" min="0">
-                        <small>Lower numbers appear first</small>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary"><%= client ? 'Update' : 'Add' %> Client</button>
-                        <a href="/admin/clients" class="btn btn-secondary">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        </main>
+<%- include('layout', {
+    title: title,
+    body: `
+    <!-- EDIT HERE: Back Button -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="/admin/clients" class="btn btn-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> Back to Clients
+            </a>
+        </div>
     </div>
-</body>
-</html>
+    
+    <!-- EDIT HERE: Alerts Section -->
+    ${success ? '<div class="alert alert-success alert-dismissible"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="icon fas fa-check"></i> Client saved successfully!</div>' : ''}
+    ${errors && errors.length > 0 ? '<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="icon fas fa-ban"></i><ul class="mb-0">' + errors.map(e => '<li>' + e.msg + '</li>').join('') + '</ul></div>' : ''}
+    
+    <!-- EDIT HERE: Client Form Card -->
+    <div class="card card-success">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-building mr-1"></i> ${client ? 'Edit' : 'Add New'} Client</h3>
+        </div>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="uploadType" value="images">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- EDIT HERE: Client Name -->
+                        <div class="form-group">
+                            <label for="name"><i class="fas fa-tag mr-1"></i> Client Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" value="${client ? client.name : ''}" required placeholder="Enter client name">
+                            <small class="text-muted">This will also be used to generate the URL slug</small>
+                        </div>
+                        
+                        <!-- EDIT HERE: Short Description -->
+                        <div class="form-group">
+                            <label for="description"><i class="fas fa-align-left mr-1"></i> Short Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description for client cards">${client ? (client.description || '') : ''}</textarea>
+                        </div>
+                        
+                        <!-- EDIT HERE: Detailed Description -->
+                        <div class="form-group">
+                            <label for="detailed_description"><i class="fas fa-file-alt mr-1"></i> Detailed Description (HTML allowed)</label>
+                            <textarea class="form-control" id="detailed_description" name="detailed_description" rows="6" placeholder="Full description for the client detail page. You can use HTML tags.">${client ? (client.detailed_description || '') : ''}</textarea>
+                            <small class="text-muted">This content will appear on the client detail page. You can include HTML formatting.</small>
+                        </div>
+                        
+                        <!-- EDIT HERE: Website URL -->
+                        <div class="form-group">
+                            <label for="website"><i class="fas fa-globe mr-1"></i> Website URL</label>
+                            <input type="url" class="form-control" id="website" name="website" value="${client ? (client.website || '') : ''}" placeholder="https://www.example.com">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <!-- EDIT HERE: Client Logo -->
+                        <div class="form-group">
+                            <label><i class="fas fa-image mr-1"></i> Client Logo</label>
+                            ${client && client.logo ? '<div class="mb-2"><img src="' + client.logo + '" alt="Current logo" class="img-thumbnail" style="max-width: 100%; background: #f8f9fa; padding: 10px;"></div>' : ''}
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="logo" name="logo" accept="image/*">
+                                <label class="custom-file-label" for="logo">Choose file</label>
+                            </div>
+                            <small class="text-muted">Recommended: PNG with transparent background, 200x200px</small>
+                        </div>
+                        
+                        <!-- EDIT HERE: Display Order -->
+                        <div class="form-group">
+                            <label for="order_index"><i class="fas fa-sort-numeric-up mr-1"></i> Display Order</label>
+                            <input type="number" class="form-control" id="order_index" name="order_index" value="${client ? client.order_index : 0}" min="0">
+                            <small class="text-muted">Lower numbers appear first</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save mr-1"></i> ${client ? 'Update' : 'Add'} Client
+                </button>
+                <a href="/admin/clients" class="btn btn-secondary">
+                    <i class="fas fa-times mr-1"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+    `,
+    extraScripts: `
+    <script>
+        // EDIT HERE: Custom file input label update
+        document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+            var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file';
+            e.target.nextElementSibling.textContent = fileName;
+        });
+    </script>
+    `
+}) %>

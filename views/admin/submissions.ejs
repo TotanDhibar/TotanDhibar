@@ -1,197 +1,165 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title><%= title %></title>
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/admin.css">
-  <style>
-    .message-cell {
-      max-width: 300px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-    .message-preview {
-      cursor: pointer;
-      color: #0066cc;
-    }
-    .message-preview:hover {
-      text-decoration: underline;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-    }
-    .modal-content {
-      background-color: #fefefe;
-      margin: 5% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 600px;
-      border-radius: 5px;
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .close:hover,
-    .close:focus {
-      color: #000;
-    }
-    .submission-detail {
-      margin: 10px 0;
-    }
-    .submission-detail strong {
-      display: inline-block;
-      width: 100px;
-    }
-  </style>
-</head>
-<body class="admin-body">
-  <%- include('../partials/admin-header') %>
-  
-  <div class="admin-container">
-    <%- include('../partials/admin-sidebar') %>
-    
-    <main class="admin-main">
-      <div class="admin-content">
-        <h1><%= title %></h1>
-        
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Subject</th>
-              <th>Message</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (locals.submissions && submissions.length > 0) { %>
-              <% submissions.forEach(sub => { %>
-              <tr>
-                <td><%= sub.name %></td>
-                <td><%= sub.email %></td>
-                <td><%= sub.phone || 'N/A' %></td>
-                <td><%= sub.subject %></td>
-                <td class="message-cell">
-                  <span class="message-preview" onclick="showMessage(<%= sub.id %>)">
-                    <%= sub.message.length > 50 ? sub.message.substring(0, 50) + '...' : sub.message %>
-                  </span>
-                </td>
-                <td><%= new Date(sub.submitted_at).toLocaleString() %></td>
-                <td>
-                  <% if (sub.is_read) { %>
-                  <span class="badge badge-read">Read</span>
-                  <% } else { %>
-                  <span class="badge badge-unread">Unread</span>
-                  <% } %>
-                </td>
-                <td>
-                  <% if (!sub.is_read) { %>
-                  <form method="POST" action="/admin/submissions/mark-read/<%= sub.id %>" style="display:inline;">
-                    <button type="submit" class="btn btn-small">Mark Read</button>
-                  </form>
-                  <% } %>
-                  <form method="POST" action="/admin/submissions/delete/<%= sub.id %>" style="display:inline;">
-                    <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Delete?')">Delete</button>
-                  </form>
-                </td>
-              </tr>
-              <% }); %>
-            <% } else { %>
-              <tr>
-                <td colspan="8">No submissions</td>
-              </tr>
-            <% } %>
-          </tbody>
-        </table>
-      </div>
-    </main>
-  </div>
-
-  <!-- Modal for full message -->
-  <div id="messageModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeMessage()">&times;</span>
-      <h2>Submission Details</h2>
-      <div id="modalBody"></div>
+<%- include('layout', {
+    title: title,
+    body: `
+    <!-- EDIT HERE: Contact Submissions Card -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-envelope mr-1"></i> Contact Form Submissions</h3>
+            <div class="card-tools">
+                <div class="input-group input-group-sm" style="width: 200px;">
+                    <input type="text" class="form-control float-right" placeholder="Search" id="submissionSearch">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-default">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body table-responsive p-0">
+            <table class="table table-hover" id="submissionsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th style="width: 150px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+` + (submissions && submissions.length > 0 ? submissions.map(sub => `
+                    <tr class="${sub.is_read ? '' : 'table-warning'}">
+                        <td><strong>${sub.name}</strong></td>
+                        <td>
+                            <a href="mailto:${sub.email}">${sub.email}</a>
+                            ${sub.phone ? '<br><small class="text-muted"><i class="fas fa-phone"></i> ' + sub.phone + '</small>' : ''}
+                        </td>
+                        <td>
+                            <span class="message-preview" style="cursor: pointer; color: #007bff;" onclick="showMessage(${sub.id})">
+                                ${sub.subject || 'No Subject'}
+                            </span>
+                        </td>
+                        <td><small>${new Date(sub.submitted_at).toLocaleString()}</small></td>
+                        <td>
+                            ${sub.is_read ? '<span class="badge badge-success"><i class="fas fa-check"></i> Read</span>' : '<span class="badge badge-warning"><i class="fas fa-envelope"></i> Unread</span>'}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-info" onclick="showMessage(${sub.id})" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ${!sub.is_read ? '<form method="POST" action="/admin/submissions/mark-read/' + sub.id + '" style="display:inline;"><button type="submit" class="btn btn-sm btn-success" title="Mark as Read"><i class="fas fa-check"></i></button></form>' : ''}
+                                <form method="POST" action="/admin/submissions/delete/${sub.id}" style="display:inline;" onsubmit="return confirm('Delete this submission?');">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+`).join('') : '<tr><td colspan="6" class="text-center text-muted p-4">No submissions yet</td></tr>') + `
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer clearfix">
+            <span class="text-muted">Total: ${submissions ? submissions.length : 0} submissions</span>
+        </div>
     </div>
-  </div>
-
-  <script>
-    // Safely embed JSON data by escaping special characters
-    const submissions = JSON.parse(decodeURIComponent("<%= encodeURIComponent(JSON.stringify(submissions)) %>"));
     
-    function showMessage(id) {
-      const submission = submissions.find(s => s.id === id);
-      if (!submission) return;
-      
-      const modalBody = document.getElementById('modalBody');
-      
-      // Safely create elements to avoid XSS
-      modalBody.innerHTML = '';
-      
-      const createDetail = (label, value) => {
-        const div = document.createElement('div');
-        div.className = 'submission-detail';
-        const strong = document.createElement('strong');
-        strong.textContent = label + ':';
-        div.appendChild(strong);
-        div.appendChild(document.createTextNode(' ' + value));
-        return div;
-      };
-      
-      modalBody.appendChild(createDetail('Name', submission.name));
-      modalBody.appendChild(createDetail('Email', submission.email));
-      modalBody.appendChild(createDetail('Phone', submission.phone || 'N/A'));
-      modalBody.appendChild(createDetail('Subject', submission.subject));
-      modalBody.appendChild(createDetail('Date', new Date(submission.submitted_at).toLocaleString()));
-      
-      const messageLabel = document.createElement('div');
-      messageLabel.className = 'submission-detail';
-      const messageLabelStrong = document.createElement('strong');
-      messageLabelStrong.textContent = 'Message:';
-      messageLabel.appendChild(messageLabelStrong);
-      modalBody.appendChild(messageLabel);
-      
-      const messageDiv = document.createElement('div');
-      messageDiv.style.marginTop = '10px';
-      messageDiv.style.padding = '10px';
-      messageDiv.style.background = '#f5f5f5';
-      messageDiv.style.borderRadius = '5px';
-      messageDiv.style.whiteSpace = 'pre-wrap';
-      messageDiv.textContent = submission.message;
-      modalBody.appendChild(messageDiv);
-      
-      document.getElementById('messageModal').style.display = 'block';
-    }
-    
-    function closeMessage() {
-      document.getElementById('messageModal').style.display = 'none';
-    }
-    
-    window.onclick = function(event) {
-      const modal = document.getElementById('messageModal');
-      if (event.target == modal) {
-        modal.style.display = 'none';
-      }
-    }
-  </script>
-</body>
-</html>
+    <!-- EDIT HERE: Message Detail Modal -->
+    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title text-white"><i class="fas fa-envelope mr-1"></i> Submission Details</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    `,
+    extraScripts: `
+    <script>
+        // EDIT HERE: Safe JSON parsing for submissions data
+        var submissions = JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(submissions))}"));
+        
+        // EDIT HERE: Show message details in modal
+        function showMessage(id) {
+            var submission = submissions.find(function(s) { return s.id === id; });
+            if (!submission) return;
+            
+            var modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = '';
+            
+            var html = '<div class="row">' +
+                '<div class="col-md-6">' +
+                    '<div class="form-group">' +
+                        '<label class="font-weight-bold"><i class="fas fa-user mr-1"></i> Name</label>' +
+                        '<p>' + escapeHtml(submission.name) + '</p>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                    '<div class="form-group">' +
+                        '<label class="font-weight-bold"><i class="fas fa-envelope mr-1"></i> Email</label>' +
+                        '<p><a href="mailto:' + escapeHtml(submission.email) + '">' + escapeHtml(submission.email) + '</a></p>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                    '<div class="form-group">' +
+                        '<label class="font-weight-bold"><i class="fas fa-phone mr-1"></i> Phone</label>' +
+                        '<p>' + (submission.phone ? escapeHtml(submission.phone) : 'N/A') + '</p>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                    '<div class="form-group">' +
+                        '<label class="font-weight-bold"><i class="fas fa-calendar mr-1"></i> Date</label>' +
+                        '<p>' + new Date(submission.submitted_at).toLocaleString() + '</p>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="col-12">' +
+                    '<div class="form-group">' +
+                        '<label class="font-weight-bold"><i class="fas fa-tag mr-1"></i> Subject</label>' +
+                        '<p>' + escapeHtml(submission.subject || 'No Subject') + '</p>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="col-12">' +
+                    '<div class="form-group">' +
+                        '<label class="font-weight-bold"><i class="fas fa-comment mr-1"></i> Message</label>' +
+                        '<div class="card"><div class="card-body bg-light" style="white-space: pre-wrap;">' + escapeHtml(submission.message) + '</div></div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+            
+            modalBody.innerHTML = html;
+            $('#messageModal').modal('show');
+        }
+        
+        // EDIT HERE: HTML escape function
+        function escapeHtml(str) {
+            if (!str) return '';
+            var div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        // EDIT HERE: Simple table search
+        document.getElementById('submissionSearch').addEventListener('keyup', function() {
+            var searchText = this.value.toLowerCase();
+            var rows = document.querySelectorAll('#submissionsTable tbody tr');
+            rows.forEach(function(row) {
+                var text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+    </script>
+    `
+}) %>

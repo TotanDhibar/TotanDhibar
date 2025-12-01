@@ -1,2 +1,96 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title><%= title %></title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/admin.css"></head><body class="admin-body"><%- include('../partials/admin-header') %><div class="admin-container"><%- include('../partials/admin-sidebar') %><main class="admin-main"><div class="admin-content"><h1><%= title %></h1><% if (locals.errors && errors.length > 0) { %><div class="alert alert-error"><ul><% errors.forEach(e => { %><li><%= e.msg %></li><% }); %></ul></div><% } %><form method="POST" enctype="multipart/form-data" class="admin-form"><div class="form-group"><label>Project Title *</label><input type="text" name="title" value="<%= project ? project.title : '' %>" required></div><div class="form-group"><label>Description</label><textarea name="description" rows="5"><%= project ? project.description || '' : '' %></textarea></div><div class="form-group"><label>Client</label><select name="client_id"><option value="">Select Client</option><% if (locals.clients) { %><% clients.forEach(c => { %><option value="<%= c.id %>" <%= project && project.client_id == c.id ? 'selected' : '' %>><%= c.name %></option><% }); %><% } %></select></div><div class="form-group"><label>Image</label><input type="file" name="image" accept="image/*"><input type="hidden" name="uploadType" value="images"></div><div class="form-group"><label>Completion Date</label><input type="date" name="completion_date" value="<%= project && project.completion_date ? project.completion_date : '' %>"></div><div class="form-actions"><button type="submit" class="btn btn-primary">Save</button><a href="/admin/projects" class="btn btn-secondary">Cancel</a></div></form></div></main></div></body></html>
+<%- include('layout', {
+    title: title,
+    body: `
+    <!-- EDIT HERE: Back Button -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="/admin/projects" class="btn btn-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> Back to Projects
+            </a>
+        </div>
+    </div>
+    
+    <!-- EDIT HERE: Alerts Section -->
+    ${success ? '<div class="alert alert-success alert-dismissible"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="icon fas fa-check"></i> Project saved successfully!</div>' : ''}
+    ${errors && errors.length > 0 ? '<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="icon fas fa-ban"></i><ul class="mb-0">' + errors.map(e => '<li>' + e.msg + '</li>').join('') + '</ul></div>' : ''}
+    
+    <!-- EDIT HERE: Project Form Card -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-images mr-1"></i> ${project ? 'Edit' : 'Add New'} Project</h3>
+        </div>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="uploadType" value="images">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- EDIT HERE: Project Title -->
+                        <div class="form-group">
+                            <label for="title"><i class="fas fa-heading mr-1"></i> Project Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" value="${project ? project.title : ''}" required placeholder="Enter project title">
+                        </div>
+                        
+                        <!-- EDIT HERE: Description -->
+                        <div class="form-group">
+                            <label for="description"><i class="fas fa-align-left mr-1"></i> Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" placeholder="Project description">${project ? (project.description || '') : ''}</textarea>
+                        </div>
+                        
+                        <!-- EDIT HERE: Category -->
+                        <div class="form-group">
+                            <label for="category"><i class="fas fa-tag mr-1"></i> Category</label>
+                            <input type="text" class="form-control" id="category" name="category" value="${project ? (project.category || '') : ''}" placeholder="e.g., Power Plant, Industrial, etc.">
+                            <small class="text-muted">Used for filtering projects in the gallery</small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <!-- EDIT HERE: Project Image -->
+                        <div class="form-group">
+                            <label><i class="fas fa-image mr-1"></i> Project Image</label>
+                            ${project && project.image ? '<div class="mb-2"><img src="' + project.image + '" alt="Current image" class="img-thumbnail" style="max-width: 100%;"></div>' : ''}
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="image" name="image" accept="image/*">
+                                <label class="custom-file-label" for="image">Choose file</label>
+                            </div>
+                            <small class="text-muted">Recommended: 1600x1200px</small>
+                        </div>
+                        
+                        <!-- EDIT HERE: Client Selection -->
+                        <div class="form-group">
+                            <label for="client_id"><i class="fas fa-building mr-1"></i> Client</label>
+                            <select class="form-control" id="client_id" name="client_id">
+                                <option value="">-- Select Client --</option>
+                                ` + (clients ? clients.map(c => `<option value="${c.id}" ${project && project.client_id == c.id ? 'selected' : ''}>${c.name}</option>`).join('') : '') + `
+                            </select>
+                        </div>
+                        
+                        <!-- EDIT HERE: Completion Date -->
+                        <div class="form-group">
+                            <label for="completion_date"><i class="fas fa-calendar mr-1"></i> Completion Date</label>
+                            <input type="date" class="form-control" id="completion_date" name="completion_date" value="${project && project.completion_date ? project.completion_date : ''}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-warning">
+                    <i class="fas fa-save mr-1"></i> ${project ? 'Update' : 'Add'} Project
+                </button>
+                <a href="/admin/projects" class="btn btn-secondary">
+                    <i class="fas fa-times mr-1"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+    `,
+    extraScripts: `
+    <script>
+        // EDIT HERE: Custom file input label update
+        document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+            var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file';
+            e.target.nextElementSibling.textContent = fileName;
+        });
+    </script>
+    `
+}) %>

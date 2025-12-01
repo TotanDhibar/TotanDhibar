@@ -1,2 +1,104 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title><%= title %></title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/admin.css"></head><body class="admin-body"><%- include('../partials/admin-header') %><div class="admin-container"><%- include('../partials/admin-sidebar') %><main class="admin-main"><div class="admin-content"><h1><%= title %></h1><form method="POST" action="/admin/downloads/add" enctype="multipart/form-data" class="admin-form" style="max-width:600px;margin-bottom:30px;"><h3>Upload New Document</h3><div class="form-group"><label>Title *</label><input type="text" name="title" required></div><div class="form-group"><label>Category</label><input type="text" name="category" placeholder="e.g., Brochure, Manual"></div><div class="form-group"><label>Description</label><textarea name="description" rows="3"></textarea></div><div class="form-group"><label>File *</label><input type="file" name="file" required><input type="hidden" name="uploadType" value="certificates"></div><button type="submit" class="btn btn-primary">Upload</button></form><h2>Uploaded Documents</h2><table class="admin-table"><thead><tr><th>Title</th><th>Category</th><th>Upload Date</th><th>Actions</th></tr></thead><tbody><% if (locals.downloads && downloads.length > 0) { %><% downloads.forEach(d => { %><tr><td><%= d.title %></td><td><%= d.category || 'N/A' %></td><td><%= new Date(d.upload_date).toLocaleDateString() %></td><td><a href="<%= d.file_path %>" class="btn btn-small" target="_blank">View</a><form method="POST" action="/admin/downloads/delete/<%= d.id %>" style="display:inline;"><button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Delete?')">Delete</button></form></td></tr><% }); %><% } else { %><tr><td colspan="4">No documents uploaded</td></tr><% } %></tbody></table></div></main></div></body></html>
+<%- include('layout', {
+    title: title,
+    body: `
+    <div class="row">
+        <!-- EDIT HERE: Upload New Document Card -->
+        <div class="col-md-4">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-upload mr-1"></i> Upload New Document</h3>
+                </div>
+                <form method="POST" action="/admin/downloads/add" enctype="multipart/form-data">
+                    <input type="hidden" name="uploadType" value="certificates">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="title"><i class="fas fa-tag mr-1"></i> Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" required placeholder="Document title">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category"><i class="fas fa-folder mr-1"></i> Category</label>
+                            <input type="text" class="form-control" id="category" name="category" placeholder="e.g., Brochure, Manual">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description"><i class="fas fa-align-left mr-1"></i> Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description (optional)"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-file mr-1"></i> File <span class="text-danger">*</span></label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="file" name="file" required>
+                                <label class="custom-file-label" for="file">Choose file</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-upload mr-1"></i> Upload Document
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- EDIT HERE: Uploaded Documents Card -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-download mr-1"></i> Uploaded Documents</h3>
+                </div>
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Upload Date</th>
+                                <th style="width: 150px">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+` + (downloads && downloads.length > 0 ? downloads.map(d => `
+                            <tr>
+                                <td><strong>${d.title}</strong></td>
+                                <td>${d.category ? '<span class="badge badge-info">' + d.category + '</span>' : '<span class="text-muted">Uncategorized</span>'}</td>
+                                <td><small>${new Date(d.upload_date).toLocaleDateString()}</small></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="${d.file_path}" class="btn btn-sm btn-secondary" target="_blank" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="${d.file_path}" class="btn btn-sm btn-info" download title="Download">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        <form method="POST" action="/admin/downloads/delete/${d.id}" style="display:inline;" onsubmit="return confirm('Delete this document?');">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+`).join('') : '<tr><td colspan="4" class="text-center text-muted p-4">No documents uploaded yet</td></tr>') + `
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer clearfix">
+                    <span class="text-muted">Total: ${downloads ? downloads.length : 0} documents</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    `,
+    extraScripts: `
+    <script>
+        // EDIT HERE: Custom file input label update
+        document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+            var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file';
+            e.target.nextElementSibling.textContent = fileName;
+        });
+    </script>
+    `
+}) %>
