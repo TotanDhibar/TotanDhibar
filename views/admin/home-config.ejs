@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin Panel</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+    <%- include('../partials/admin-header') %>
+    
+    <div class="admin-container">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <main class="admin-main">
+            <div class="admin-content">
+                <div class="content-header">
+                    <h1><%= title %></h1>
+                </div>
+
+                <% if (success) { %>
+                <div class="alert alert-success">Home page configuration saved successfully!</div>
+                <% } %>
+
+                <% if (errors && errors.length > 0) { %>
+                <div class="alert alert-error">
+                    <ul>
+                        <% errors.forEach(function(error) { %>
+                        <li><%= error.msg %></li>
+                        <% }); %>
+                    </ul>
+                </div>
+                <% } %>
+
+                <form method="POST" action="/admin/home-config" enctype="multipart/form-data" class="admin-form">
+                    <h3>Hero Section</h3>
+                    
+                    <div class="form-group">
+                        <label for="hero_title">Hero Title</label>
+                        <input type="text" id="hero_title" name="hero_title" value="<%= homeConfig ? homeConfig.hero_title : 'UCC Engineering Contractors' %>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hero_subtitle">Hero Subtitle</label>
+                        <input type="text" id="hero_subtitle" name="hero_subtitle" value="<%= homeConfig ? homeConfig.hero_subtitle : 'Excellence in Power Plant Maintenance & Engineering' %>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hero_background">Hero Background Image</label>
+                        <% if (homeConfig && homeConfig.hero_background) { %>
+                        <div style="margin-bottom: 10px;">
+                            <img src="<%= homeConfig.hero_background %>" alt="Current background" style="max-width: 300px; border-radius: 8px;">
+                        </div>
+                        <% } %>
+                        <input type="file" id="hero_background" name="hero_background" accept="image/*">
+                        <small>Recommended: 1920x1080px or larger</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="animated_text">Animated Text (separate with |)</label>
+                        <input type="text" id="animated_text" name="animated_text" value="<%= homeConfig ? homeConfig.animated_text : 'Power Plant Maintenance|Industrial Engineering|Quality Services' %>" placeholder="Text 1|Text 2|Text 3">
+                        <small>These texts will be displayed with typing animation. Separate phrases with | character.</small>
+                    </div>
+
+                    <h3>Statistics Section</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="stat1_label">Stat 1 Label</label>
+                            <input type="text" id="stat1_label" name="stat1_label" value="<%= homeConfig ? homeConfig.stat1_label : 'Projects Completed' %>">
+                        </div>
+                        <div class="form-group">
+                            <label for="stat1_value">Stat 1 Value</label>
+                            <input type="number" id="stat1_value" name="stat1_value" value="<%= homeConfig ? homeConfig.stat1_value : 500 %>">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="stat2_label">Stat 2 Label</label>
+                            <input type="text" id="stat2_label" name="stat2_label" value="<%= homeConfig ? homeConfig.stat2_label : 'Happy Clients' %>">
+                        </div>
+                        <div class="form-group">
+                            <label for="stat2_value">Stat 2 Value</label>
+                            <input type="number" id="stat2_value" name="stat2_value" value="<%= homeConfig ? homeConfig.stat2_value : 50 %>">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="stat3_label">Stat 3 Label</label>
+                            <input type="text" id="stat3_label" name="stat3_label" value="<%= homeConfig ? homeConfig.stat3_label : 'Years Experience' %>">
+                        </div>
+                        <div class="form-group">
+                            <label for="stat3_value">Stat 3 Value</label>
+                            <input type="number" id="stat3_value" name="stat3_value" value="<%= homeConfig ? homeConfig.stat3_value : 15 %>">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="stat4_label">Stat 4 Label</label>
+                            <input type="text" id="stat4_label" name="stat4_label" value="<%= homeConfig ? homeConfig.stat4_label : 'Team Members' %>">
+                        </div>
+                        <div class="form-group">
+                            <label for="stat4_value">Stat 4 Value</label>
+                            <input type="number" id="stat4_value" name="stat4_value" value="<%= homeConfig ? homeConfig.stat4_value : 100 %>">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

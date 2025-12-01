@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - <%= contactInfo ? contactInfo.company_name : 'UCC Engineering' %></title>
+    <meta name="description" content="<%= service.description %>">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="site-header">
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">
+                <% if (contactInfo && contactInfo.company_logo && contactInfo.company_logo.startsWith('/uploads/')) { %>
+                <a href="/"><img src="<%= contactInfo.company_logo %>" alt="<%= contactInfo.company_name || 'UCC Engineering' %>" class="logo-image"></a>
+                <% } else { %>
+                <h1><a href="/"><%= contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %></a></h1>
+                <% } %>
+            </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/services" class="active">Services</a></li>
+                <li><a href="/clients">Clients</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/certificates">Certificates</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+    
+    <main>
+        <section class="page-header service-header">
+            <div class="container">
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> / <a href="/services">Services</a> / <span><%= service.name %></span>
+                </nav>
+                <h1><%= service.name %></h1>
+            </div>
+        </section>
+
+        <section class="service-detail-section">
+            <div class="container">
+                <div class="service-detail-grid">
+                    <div class="service-main-content">
+                        <% if (service.image) { %>
+                        <div class="service-image animate-fade-in">
+                            <img src="<%= service.image %>" alt="<%= service.name %>">
+                        </div>
+                        <% } %>
+                        
+                        <div class="service-description animate-slide-up">
+                            <h2>About This Service</h2>
+                            <p class="lead"><%= service.description %></p>
+                            
+                            <% if (service.detailed_description) { %>
+                            <div class="detailed-content">
+                                <%- service.detailed_description %>
+                            </div>
+                            <% } else { %>
+                            <div class="detailed-content">
+                                <p>We provide comprehensive <%= service.name.toLowerCase() %> services for power plants and industrial facilities. Our team of experienced engineers ensures that all work is carried out to the highest standards of safety and quality.</p>
+                                
+                                <h3>Key Features</h3>
+                                <ul class="feature-list">
+                                    <li>Expert technical team with years of industry experience</li>
+                                    <li>24/7 support for critical operations</li>
+                                    <li>Adherence to all safety standards and regulations</li>
+                                    <li>Cost-effective solutions without compromising quality</li>
+                                    <li>Modern equipment and latest technologies</li>
+                                </ul>
+                                
+                                <h3>Why Choose Us?</h3>
+                                <p>With our proven track record of successful projects and satisfied clients, we are the trusted partner for your <%= service.name.toLowerCase() %> needs. Our commitment to excellence and customer satisfaction sets us apart from the competition.</p>
+                            </div>
+                            <% } %>
+                        </div>
+                        
+                        <div class="service-cta animate-slide-up">
+                            <h3>Interested in this service?</h3>
+                            <p>Contact us today to discuss your requirements and get a customized quote.</p>
+                            <a href="/contact" class="btn btn-primary">Get a Quote</a>
+                        </div>
+                    </div>
+                    
+                    <div class="service-sidebar">
+                        <div class="sidebar-card animate-fade-in">
+                            <h3>Quick Contact</h3>
+                            <% if (contactInfo) { %>
+                            <div class="contact-info-mini">
+                                <% if (contactInfo.phone) { %>
+                                <p><strong>Phone:</strong><br><%= contactInfo.phone %></p>
+                                <% } %>
+                                <% if (contactInfo.email) { %>
+                                <p><strong>Email:</strong><br><%= contactInfo.email %></p>
+                                <% } %>
+                            </div>
+                            <% } %>
+                            <a href="/contact" class="btn btn-primary btn-block">Contact Us</a>
+                        </div>
+                        
+                        <% if (relatedServices && relatedServices.length > 0) { %>
+                        <div class="sidebar-card animate-fade-in">
+                            <h3>Related Services</h3>
+                            <ul class="related-services-list">
+                                <% relatedServices.forEach(function(relService) { %>
+                                <li>
+                                    <a href="/services/<%= relService.slug %>">
+                                        <span class="service-icon">🔧</span>
+                                        <%= relService.name %>
+                                    </a>
+                                </li>
+                                <% }); %>
+                            </ul>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container">
+                <h2>Ready to Get Started?</h2>
+                <p>Contact us today for a free consultation and quote.</p>
+                <div class="cta-buttons">
+                    <a href="/contact" class="btn btn-light">Contact Us</a>
+                    <a href="/services" class="btn btn-secondary">View All Services</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><%= contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %></h3>
+                <p>Professional power plant maintenance and engineering solutions.</p>
+            </div>
+            <% if (contactInfo) { %>
+            <div class="footer-section">
+                <h4>Contact Us</h4>
+                <% if (contactInfo.address) { %><p><%= contactInfo.address %></p><% } %>
+                <% if (contactInfo.location) { %><p><%= contactInfo.location %></p><% } %>
+                <% if (contactInfo.phone) { %><p>Phone: <a href="tel:<%= contactInfo.phone %>"><%= contactInfo.phone %></a></p><% } %>
+                <% if (contactInfo.email) { %><p>Email: <a href="mailto:<%= contactInfo.email %>"><%= contactInfo.email %></a></p><% } %>
+            </div>
+            <% } %>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/services">Services</a></li>
+                    <li><a href="/clients">Clients</a></li>
+                    <li><a href="/projects">Projects</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <%= new Date().getFullYear() %> <%= contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %>. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+    <script src="/js/main.js"></script>
+</body>
+</html>

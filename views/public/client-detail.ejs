@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - <%= contactInfo ? contactInfo.company_name : 'UCC Engineering' %></title>
+    <meta name="description" content="<%= client.description %>">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="site-header">
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">
+                <% if (contactInfo && contactInfo.company_logo && contactInfo.company_logo.startsWith('/uploads/')) { %>
+                <a href="/"><img src="<%= contactInfo.company_logo %>" alt="<%= contactInfo.company_name || 'UCC Engineering' %>" class="logo-image"></a>
+                <% } else { %>
+                <h1><a href="/"><%= contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %></a></h1>
+                <% } %>
+            </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/services">Services</a></li>
+                <li><a href="/clients" class="active">Clients</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/certificates">Certificates</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+    
+    <main>
+        <section class="page-header client-header">
+            <div class="container">
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> / <a href="/clients">Clients</a> / <span><%= client.name %></span>
+                </nav>
+                <h1><%= client.name %></h1>
+            </div>
+        </section>
+
+        <section class="client-detail-section">
+            <div class="container">
+                <div class="client-detail-grid">
+                    <div class="client-main-content">
+                        <div class="client-profile animate-fade-in">
+                            <% if (client.logo) { %>
+                            <div class="client-logo-large">
+                                <img src="<%= client.logo %>" alt="<%= client.name %> Logo">
+                            </div>
+                            <% } %>
+                            
+                            <div class="client-info">
+                                <h2>About <%= client.name %></h2>
+                                <p class="lead"><%= client.description %></p>
+                                
+                                <% if (client.detailed_description) { %>
+                                <div class="detailed-content">
+                                    <%- client.detailed_description %>
+                                </div>
+                                <% } %>
+                                
+                                <% if (client.website) { %>
+                                <div class="client-website">
+                                    <strong>Website:</strong> 
+                                    <a href="<%= client.website %>" target="_blank" rel="noopener noreferrer"><%= client.website %></a>
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <% if (clientProjects && clientProjects.length > 0) { %>
+                        <div class="client-projects animate-slide-up">
+                            <h2>Projects with <%= client.name %></h2>
+                            <div class="projects-grid">
+                                <% clientProjects.forEach(function(project) { %>
+                                <div class="project-card">
+                                    <% if (project.image) { %>
+                                    <div class="project-image">
+                                        <img src="<%= project.image %>" alt="<%= project.title %>">
+                                    </div>
+                                    <% } %>
+                                    <div class="project-content">
+                                        <h3><%= project.title %></h3>
+                                        <% if (project.description) { %>
+                                        <p><%= project.description %></p>
+                                        <% } %>
+                                        <% if (project.category) { %>
+                                        <span class="category-badge"><%= project.category %></span>
+                                        <% } %>
+                                        <% if (project.completion_date) { %>
+                                        <p class="project-date">Completed: <%= new Date(project.completion_date).toLocaleDateString() %></p>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                        <% } else { %>
+                        <div class="no-projects animate-slide-up">
+                            <p>We have successfully completed various projects with <%= client.name %>. Contact us for more details about our collaboration.</p>
+                        </div>
+                        <% } %>
+                    </div>
+                    
+                    <div class="client-sidebar">
+                        <div class="sidebar-card animate-fade-in">
+                            <h3>Work With Us</h3>
+                            <p>Interested in partnering with UCC Engineering Contractors?</p>
+                            <a href="/contact" class="btn btn-primary btn-block">Contact Us</a>
+                        </div>
+                        
+                        <div class="sidebar-card animate-fade-in">
+                            <h3>Our Services</h3>
+                            <p>Explore the range of services we offer to our clients.</p>
+                            <a href="/services" class="btn btn-secondary btn-block">View Services</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container">
+                <h2>Become Our Partner</h2>
+                <p>Join our growing list of satisfied clients and experience excellence in engineering services.</p>
+                <div class="cta-buttons">
+                    <a href="/contact" class="btn btn-light">Contact Us</a>
+                    <a href="/clients" class="btn btn-secondary">View All Clients</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><%= contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %></h3>
+                <p>Professional power plant maintenance and engineering solutions.</p>
+            </div>
+            <% if (contactInfo) { %>
+            <div class="footer-section">
+                <h4>Contact Us</h4>
+                <% if (contactInfo.address) { %><p><%= contactInfo.address %></p><% } %>
+                <% if (contactInfo.location) { %><p><%= contactInfo.location %></p><% } %>
+                <% if (contactInfo.phone) { %><p>Phone: <a href="tel:<%= contactInfo.phone %>"><%= contactInfo.phone %></a></p><% } %>
+                <% if (contactInfo.email) { %><p>Email: <a href="mailto:<%= contactInfo.email %>"><%= contactInfo.email %></a></p><% } %>
+            </div>
+            <% } %>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/services">Services</a></li>
+                    <li><a href="/clients">Clients</a></li>
+                    <li><a href="/projects">Projects</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <%= new Date().getFullYear() %> <%= contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %>. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+    <script src="/js/main.js"></script>
+</body>
+</html>

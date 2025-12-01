@@ -13,34 +13,71 @@
         <%- include('../partials/admin-sidebar') %>
         <main class="admin-main">
             <div class="admin-content">
-                <h1><%= title %></h1>
-                <% if (locals.success && success) { %>
+                <div class="content-header">
+                    <h1><%= title %></h1>
+                    <a href="/admin/services" class="btn btn-secondary">← Back to Services</a>
+                </div>
+                
+                <% if (success) { %>
                 <div class="alert alert-success">Service saved successfully!</div>
                 <% } %>
-                <% if (locals.errors && errors.length > 0) { %>
+                <% if (errors && errors.length > 0) { %>
                 <div class="alert alert-error">
-                    <ul><% errors.forEach(error => { %><li><%= error.msg %></li><% }); %></ul>
+                    <ul><% errors.forEach(function(error) { %><li><%= error.msg %></li><% }); %></ul>
                 </div>
                 <% } %>
-                <form method="POST" class="admin-form">
+                
+                <form method="POST" enctype="multipart/form-data" class="admin-form">
                     <div class="form-group">
                         <label>Service Name *</label>
                         <input type="text" name="name" value="<%= service ? service.name : '' %>" required>
+                        <small>This will also be used to generate the URL slug</small>
                     </div>
+                    
                     <div class="form-group">
-                        <label>Description</label>
-                        <textarea name="description" rows="5"><%= service ? service.description || '' : '' %></textarea>
+                        <label>Short Description</label>
+                        <textarea name="description" rows="3" placeholder="Brief description for service cards"><%= service ? service.description || '' : '' %></textarea>
                     </div>
+                    
+                    <div class="form-group">
+                        <label>Detailed Description (HTML allowed)</label>
+                        <textarea name="detailed_description" rows="10" placeholder="Full description for the service detail page. You can use HTML tags."><%= service ? service.detailed_description || '' : '' %></textarea>
+                        <small>This content will appear on the service detail page. You can include HTML formatting.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Service Image</label>
+                        <% if (service && service.image) { %>
+                        <div style="margin-bottom: 10px;">
+                            <img src="<%= service.image %>" alt="Current image" style="max-width: 200px; border-radius: 8px;">
+                        </div>
+                        <% } %>
+                        <input type="file" name="image" accept="image/*">
+                        <small>Recommended: 1200x800px or larger</small>
+                    </div>
+                    
                     <div class="form-group">
                         <label>Icon</label>
-                        <input type="text" name="icon" value="<%= service ? service.icon || '' : '' %>">
+                        <select name="icon">
+                            <option value="wrench" <%= service && service.icon === 'wrench' ? 'selected' : '' %>>🔧 Wrench</option>
+                            <option value="fire" <%= service && service.icon === 'fire' ? 'selected' : '' %>>🔥 Fire</option>
+                            <option value="wind" <%= service && service.icon === 'wind' ? 'selected' : '' %>>💨 Wind</option>
+                            <option value="thermometer" <%= service && service.icon === 'thermometer' ? 'selected' : '' %>>🌡️ Thermometer</option>
+                            <option value="bolt" <%= service && service.icon === 'bolt' ? 'selected' : '' %>>⚡ Bolt</option>
+                            <option value="anchor" <%= service && service.icon === 'anchor' ? 'selected' : '' %>>⚓ Anchor</option>
+                            <option value="pause" <%= service && service.icon === 'pause' ? 'selected' : '' %>>⏸️ Pause</option>
+                            <option value="gear" <%= service && service.icon === 'gear' ? 'selected' : '' %>>⚙️ Gear</option>
+                        </select>
                     </div>
+                    
                     <div class="form-group">
-                        <label>Order</label>
-                        <input type="number" name="order_index" value="<%= service ? service.order_index : 0 %>">
+                        <label>Display Order</label>
+                        <input type="number" name="order_index" value="<%= service ? service.order_index : 0 %>" min="0">
+                        <small>Lower numbers appear first</small>
                     </div>
+                    
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary"><%= service ? 'Update' : 'Add' %> Service</button>
                         <a href="/admin/services" class="btn btn-secondary">Cancel</a>
                     </div>
                 </form>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - <%= contactInfo ? contactInfo.company_name : 'UCC Engineering' %></title>
+    <meta name="description" content="Our valued clients - power plants and industrial facilities across India trust UCC Engineering Contractors">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header', { contactInfo }) %>
+    
+    <main>
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="container">
+                <h1>Our Clients</h1>
+                <p>Trusted by leading power plants and industrial facilities across India</p>
+            </div>
+        </section>
+
+        <!-- Clients Section -->
+        <section class="clients-section">
+            <div class="container">
+                <% if (clients && clients.length > 0) { %>
+                <div class="clients-grid-detailed">
+                    <% clients.forEach(function(client, index) { %>
+                    <div class="client-card-detailed animate-fade-in" style="animation-delay: <%= index * 0.1 %>s">
+                        <% if (client.logo) { %>
+                        <div class="client-logo">
+                            <img src="<%= client.logo %>" alt="<%= client.name %> Logo">
+                        </div>
+                        <% } else { %>
+                        <div class="client-logo client-logo-placeholder">
+                            <span class="client-initial"><%= client.name.charAt(0) %></span>
+                        </div>
+                        <% } %>
+                        <div class="client-info">
+                            <h3><%= client.name %></h3>
+                            <% if (client.description) { %>
+                            <p><%= client.description %></p>
+                            <% } %>
+                            <a href="/clients/<%= client.slug %>" class="btn btn-primary btn-small">View Details</a>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+                <% } else { %>
+                <div class="no-clients text-center">
+                    <p>Our client list is being updated. Please check back soon.</p>
+                </div>
+                <% } %>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item animate-count">
+                        <span class="stat-number" data-count="<%= clients ? clients.length : 0 %>">0</span>
+                        <span class="stat-label">Trusted Clients</span>
+                    </div>
+                    <div class="stat-item animate-count">
+                        <span class="stat-number" data-count="500">0</span>+
+                        <span class="stat-label">Projects Completed</span>
+                    </div>
+                    <div class="stat-item animate-count">
+                        <span class="stat-number" data-count="15">0</span>+
+                        <span class="stat-label">Years Experience</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Become Our Partner</h2>
+                <p>Join our growing list of satisfied clients and experience excellence in engineering services.</p>
+                <a href="/contact" class="btn btn-light">Contact Us Today</a>
+            </div>
+        </section>
+    </main>
+
+    <%- include('../partials/footer', { contactInfo }) %>
+    <script src="/js/main.js"></script>
+</body>
+</html>

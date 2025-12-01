@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin Panel</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+    <%- include('../partials/admin-header') %>
+    
+    <div class="admin-container">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <main class="admin-main">
+            <div class="admin-content">
+                <div class="content-header">
+                    <h1><%= title %></h1>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- Security Section -->
+                    <div class="settings-section">
+                        <h3>Security</h3>
+                        <div class="settings-card">
+                            <h4>Change Password</h4>
+                            <p>Update your admin password</p>
+                            <a href="/admin/change-password" class="btn btn-primary btn-small">Change Password</a>
+                        </div>
+                    </div>
+
+                    <!-- Session Activity -->
+                    <div class="settings-section">
+                        <h3>Recent Activity</h3>
+                        <% if (sessionLogs && sessionLogs.length > 0) { %>
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>IP Address</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% sessionLogs.forEach(function(log) { %>
+                                <tr>
+                                    <td><%= log.action %></td>
+                                    <td><%= log.ip_address || 'Unknown' %></td>
+                                    <td><%= new Date(log.created_at).toLocaleString() %></td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>No recent activity logged.</p>
+                        <% } %>
+                    </div>
+
+                    <!-- System Info -->
+                    <div class="settings-section">
+                        <h3>System Information</h3>
+                        <div class="settings-card">
+                            <ul style="list-style: none; padding: 0;">
+                                <li><strong>CMS Version:</strong> 1.0.0</li>
+                                <li><strong>Node.js Version:</strong> <%= process.version %></li>
+                                <li><strong>Platform:</strong> <%= process.platform %></li>
+                                <li><strong>Server Time:</strong> <%= new Date().toLocaleString() %></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="settings-section">
+                        <h3>Quick Actions</h3>
+                        <div class="quick-links">
+                            <a href="/admin/contact-info" class="btn btn-secondary btn-small">Edit Company Info</a>
+                            <a href="/admin/home-config" class="btn btn-secondary btn-small">Edit Home Page</a>
+                            <a href="/admin/pages" class="btn btn-secondary btn-small">Edit Pages</a>
+                            <a href="/" target="_blank" class="btn btn-secondary btn-small">View Website</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .settings-grid {
+            display: grid;
+            gap: 2rem;
+        }
+        .settings-section h3 {
+            color: #1e3a5f;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .settings-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        .settings-card h4 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        .settings-card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        .quick-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+    </style>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

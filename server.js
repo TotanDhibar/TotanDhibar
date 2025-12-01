@@ -4,15 +4,33 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const csrf = require('csurf');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Rate limiting for general API requests
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+
+// Stricter rate limiting for login attempts
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login attempts per windowMs
+  message: 'Too many login attempts, please try again after 15 minutes.'
+});
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Apply general rate limiting to all requests
+app.use(generalLimiter);
 
 // Session configuration
 app.use(session({
@@ -26,14 +44,14 @@ app.use(session({
   }
 }));
 
-// CSRF protection
+// CSRF protection for admin routes
 const csrfProtection = csrf({ cookie: true });
 
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Make CSRF token available to all views
+// Make user session available to all views
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
@@ -42,6 +60,9 @@ app.use((req, res, next) => {
 // Routes
 const publicRoutes = require('./routes/public');
 const adminRoutes = require('./routes/admin');
+
+// Apply login rate limiter to admin login route
+app.use('/admin/login', loginLimiter);
 
 app.use('/', publicRoutes);
 app.use('/admin', adminRoutes);

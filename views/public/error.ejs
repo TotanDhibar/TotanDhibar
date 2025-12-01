@@ -3,23 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title><%= title %> - UCC Engineering</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <%- include('../partials/header') %>
+    <header class="site-header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <h1><a href="/">UCC Engineering Contractors</a></h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/services">Services</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
     
     <main>
         <section class="error-section">
             <div class="container">
-                <h1>Error</h1>
+                <h1>⚠️</h1>
                 <h2>Something went wrong</h2>
                 <p><%= message %></p>
-                <a href="/" class="btn btn-primary">Go Home</a>
+                <div style="margin-top: 2rem;">
+                    <a href="/" class="btn btn-primary">Go Home</a>
+                    <a href="/contact" class="btn btn-secondary">Contact Us</a>
+                </div>
             </div>
         </section>
     </main>
     
-    <%- include('../partials/footer') %>
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; <%= new Date().getFullYear() %> UCC Engineering Contractors. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
