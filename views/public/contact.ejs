@@ -178,8 +178,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             var lat = <%= contactInfo.gps_latitude %>;
             var lng = <%= contactInfo.gps_longitude %>;
-            var companyName = '<%= contactInfo.company_name.replace(/'/g, "\\'") %>';
-            var address = '<%= (contactInfo.address || "").replace(/'/g, "\\'") %>';
+            var companyName = <%= JSON.stringify(contactInfo.company_name) %>;
+            var address = <%= JSON.stringify(contactInfo.address || "") %>;
             
             var map = L.map('company-map').setView([lat, lng], 15);
             
