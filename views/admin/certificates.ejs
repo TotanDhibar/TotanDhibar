@@ -9,6 +9,15 @@ function escapeHtml(str) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
 }
+
+// EDIT HERE: Helper to safely escape for JavaScript string in onclick
+function escapeForJs(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"');
+}
 %>
 <%- include('layout', {
     title: title,
@@ -69,12 +78,16 @@ function escapeHtml(str) {
                             </tr>
                         </thead>
                         <tbody>
-` + (certificates && certificates.length > 0 ? certificates.map(cert => `
+` + (certificates && certificates.length > 0 ? certificates.map(cert => {
+    var safePath = encodeURI(cert.file_path || '');
+    var safeTitle = escapeForJs(cert.title || '');
+    var isPdf = cert.file_path && cert.file_path.toLowerCase().endsWith('.pdf');
+    return `
                             <tr>
                                 <td>
-                                    ${cert.file_path && !cert.file_path.endsWith('.pdf') ? 
-                                        '<img src="' + encodeURI(cert.file_path) + '" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;" onclick="previewCertificate(\\'' + encodeURI(cert.file_path) + '\\', \\'' + escapeHtml(cert.title).replace(/'/g, "\\\\'") + '\\')" title="Click to preview">' : 
-                                        '<div class="bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; cursor: pointer;" onclick="previewCertificate(\\'' + encodeURI(cert.file_path) + '\\', \\'' + escapeHtml(cert.title).replace(/'/g, "\\\\'") + '\\')"><i class="fas fa-file-pdf fa-2x text-white"></i></div>'
+                                    ${!isPdf ? 
+                                        '<img src="' + safePath + '" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;" onclick="previewCertificate(\'' + safePath + '\', \'' + safeTitle + '\')" title="Click to preview">' : 
+                                        '<div class="bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; cursor: pointer;" onclick="previewCertificate(\'' + safePath + '\', \'' + safeTitle + '\')"><i class="fas fa-file-pdf fa-2x text-white"></i></div>'
                                     }
                                 </td>
                                 <td><strong>${escapeHtml(cert.title)}</strong></td>
@@ -82,10 +95,10 @@ function escapeHtml(str) {
                                 <td><small>${new Date(cert.upload_date).toLocaleDateString()}</small></td>
                                 <td>
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-info" onclick="previewCertificate('${encodeURI(cert.file_path)}', '${escapeHtml(cert.title).replace(/'/g, "\\'")}')" title="Preview Full Quality">
+                                        <button type="button" class="btn btn-sm btn-info" onclick="previewCertificate('${safePath}', '${safeTitle}')" title="Preview Full Quality">
                                             <i class="fas fa-search-plus"></i>
                                         </button>
-                                        <a href="${encodeURI(cert.file_path)}" class="btn btn-sm btn-secondary" target="_blank" download title="Download">
+                                        <a href="${safePath}" class="btn btn-sm btn-secondary" target="_blank" download title="Download">
                                             <i class="fas fa-download"></i>
                                         </a>
                                         <form method="POST" action="/admin/certificates/delete/${parseInt(cert.id)}" style="display:inline;" onsubmit="return confirm('Delete this certificate?');">
@@ -95,8 +108,8 @@ function escapeHtml(str) {
                                         </form>
                                     </div>
                                 </td>
-                            </tr>
-`).join('') : '<tr><td colspan="5" class="text-center text-muted p-4">No certificates uploaded yet</td></tr>') + `
+                            </tr>`;
+}).join('') : '<tr><td colspan="5" class="text-center text-muted p-4">No certificates uploaded yet</td></tr>') + `
                         </tbody>
                     </table>
                 </div>
@@ -134,7 +147,7 @@ function escapeHtml(str) {
                 <div class="modal-footer border-0 justify-content-center">
                     <small class="text-muted">
                         <i class="fas fa-info-circle mr-1"></i> 
-                        Displaying full quality image. Use zoom controls in your browser for detailed view.
+                        Displaying full quality image. Click on image to toggle zoom.
                     </small>
                 </div>
             </div>
