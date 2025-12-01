@@ -1,2 +1,82 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title><%= title %></title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/admin.css"></head><body class="admin-body"><%- include('../partials/admin-header') %><div class="admin-container"><%- include('../partials/admin-sidebar') %><main class="admin-main"><div class="admin-content"><div class="content-header"><h1><%= title %></h1><a href="/admin/projects/add" class="btn btn-primary">Add New Project</a></div><table class="admin-table"><thead><tr><th>Title</th><th>Client</th><th>Date</th><th>Actions</th></tr></thead><tbody><% if (locals.projects && projects.length > 0) { %><% projects.forEach(p => { %><tr><td><%= p.title %></td><td><%= p.client_name || 'N/A' %></td><td><%= p.completion_date ? new Date(p.completion_date).toLocaleDateString() : 'N/A' %></td><td><form method="POST" action="/admin/projects/delete/<%= p.id %>" style="display:inline;"><button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Delete?')">Delete</button></form></td></tr><% }); %><% } else { %><tr><td colspan="4">No projects found</td></tr><% } %></tbody></table></div></main></div></body></html>
+<%- include('layout', {
+    title: title,
+    body: `
+    <!-- EDIT HERE: Page Header with Add Button -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="/admin/projects/add" class="btn btn-primary">
+                <i class="fas fa-plus mr-1"></i> Add New Project
+            </a>
+        </div>
+    </div>
+    
+    <!-- EDIT HERE: Projects Gallery Card -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-images mr-1"></i> Projects Gallery</h3>
+            <div class="card-tools">
+                <div class="input-group input-group-sm" style="width: 200px;">
+                    <input type="text" class="form-control float-right" placeholder="Search" id="projectSearch">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-default">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- EDIT HERE: Projects Grid View -->
+            <div class="row" id="projectsGrid">
+` + (projects && projects.length > 0 ? projects.map(p => `
+                <div class="col-md-4 col-sm-6 project-item">
+                    <div class="card">
+                        ${p.image ? '<img class="card-img-top" src="' + p.image + '" alt="' + p.title + '" style="height: 180px; object-fit: cover;">' : '<div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 180px;"><i class="fas fa-image fa-3x text-white-50"></i></div>'}
+                        <div class="card-body">
+                            <h5 class="card-title">${p.title}</h5>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-building mr-1"></i> ${p.client_name || 'No Client'}
+                                </small><br>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar mr-1"></i> ${p.completion_date ? new Date(p.completion_date).toLocaleDateString() : 'No Date'}
+                                </small>
+                                ${p.category ? '<br><span class="badge badge-info"><i class="fas fa-tag"></i> ' + p.category + '</span>' : ''}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="btn-group btn-block">
+                                <a href="/admin/projects/edit/${p.id}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <form method="POST" action="/admin/projects/delete/${p.id}" style="display:inline;" onsubmit="return confirm('Delete this project?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+`).join('') : '<div class="col-12 text-center text-muted p-4">No projects found. <a href="/admin/projects/add">Add your first project</a></div>') + `
+            </div>
+        </div>
+        <div class="card-footer clearfix">
+            <span class="text-muted">Total: ${projects ? projects.length : 0} projects</span>
+        </div>
+    </div>
+    `,
+    extraScripts: `
+    <script>
+        // EDIT HERE: Simple project search
+        document.getElementById('projectSearch').addEventListener('keyup', function() {
+            var searchText = this.value.toLowerCase();
+            var items = document.querySelectorAll('.project-item');
+            items.forEach(function(item) {
+                var text = item.textContent.toLowerCase();
+                item.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+    </script>
+    `
+}) %>

@@ -1,186 +1,157 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title><%= title %></title>
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/admin.css">
-  <style>
-    .preview-btn {
-      margin-right: 5px;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.7);
-    }
-    .modal-content {
-      background-color: #fefefe;
-      margin: 2% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 90%;
-      max-width: 900px;
-      height: 90vh;
-      border-radius: 5px;
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .close:hover,
-    .close:focus {
-      color: #000;
-    }
-    #pdfViewer {
-      width: 100%;
-      height: calc(100% - 60px);
-      border: none;
-    }
-  </style>
-</head>
-<body class="admin-body">
-  <%- include('../partials/admin-header') %>
-  
-  <div class="admin-container">
-    <%- include('../partials/admin-sidebar') %>
-    
-    <main class="admin-main">
-      <div class="admin-content">
-        <h1><%= title %></h1>
+<%- include('layout', {
+    title: title,
+    body: `
+    <div class="row">
+        <!-- EDIT HERE: Upload New Certificate Card -->
+        <div class="col-md-4">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-upload mr-1"></i> Upload New Certificate</h3>
+                </div>
+                <form method="POST" action="/admin/certificates/add" enctype="multipart/form-data">
+                    <input type="hidden" name="uploadType" value="certificates">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="title"><i class="fas fa-tag mr-1"></i> Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" required placeholder="Certificate title">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description"><i class="fas fa-align-left mr-1"></i> Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description (optional)"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-file mr-1"></i> File <span class="text-danger">*</span></label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="file" name="file" accept=".pdf,.jpg,.jpeg,.png,.gif" required>
+                                <label class="custom-file-label" for="file">Choose file</label>
+                            </div>
+                            <small class="text-muted">Accepted: PDF, JPG, JPEG, PNG, GIF</small>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-upload mr-1"></i> Upload Certificate
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
         
-        <form method="POST" action="/admin/certificates/add" enctype="multipart/form-data" class="admin-form" style="max-width:600px;margin-bottom:30px;">
-          <h3>Upload New Certificate</h3>
-          <div class="form-group">
-            <label>Title *</label>
-            <input type="text" name="title" required>
-          </div>
-          <div class="form-group">
-            <label>Description</label>
-            <textarea name="description" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label>PDF File *</label>
-            <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png,.gif" required>
-            <input type="hidden" name="uploadType" value="certificates">
-            <small>Accepted formats: PDF, JPG, JPEG, PNG, GIF</small>
-          </div>
-          <button type="submit" class="btn btn-primary">Upload Certificate</button>
-        </form>
-        
-        <h2>Uploaded Certificates</h2>
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Upload Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (locals.certificates && certificates.length > 0) { %>
-              <% certificates.forEach(cert => { %>
-              <tr>
-                <td><%= cert.title %></td>
-                <td><%= cert.description || '' %></td>
-                <td><%= new Date(cert.upload_date).toLocaleDateString() %></td>
-                <td>
-                  <button class="btn btn-small preview-btn" data-filepath="<%= cert.file_path %>" data-title="<%= cert.title %>" onclick="previewCertificate(this.dataset.filepath, this.dataset.title)">Preview</button>
-                  <a href="<%= cert.file_path %>" class="btn btn-small" target="_blank" download>Download</a>
-                  <form method="POST" action="/admin/certificates/delete/<%= cert.id %>" style="display:inline;">
-                    <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Delete?')">Delete</button>
-                  </form>
-                </td>
-              </tr>
-              <% }); %>
-            <% } else { %>
-              <tr>
-                <td colspan="4">No certificates uploaded</td>
-              </tr>
-            <% } %>
-          </tbody>
-        </table>
-      </div>
-    </main>
-  </div>
-
-  <!-- Modal for certificate preview -->
-  <div id="certificateModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closePreview()">&times;</span>
-      <h2 id="certificateTitle"></h2>
-      <iframe id="pdfViewer" src=""></iframe>
+        <!-- EDIT HERE: Uploaded Certificates Card -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-certificate mr-1"></i> Uploaded Certificates</h3>
+                </div>
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Upload Date</th>
+                                <th style="width: 200px">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+` + (certificates && certificates.length > 0 ? certificates.map(cert => `
+                            <tr>
+                                <td><strong>${cert.title}</strong></td>
+                                <td>${cert.description || '<span class="text-muted">No description</span>'}</td>
+                                <td><small>${new Date(cert.upload_date).toLocaleDateString()}</small></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-info" onclick="previewCertificate('${cert.file_path}', '${cert.title}')" title="Preview">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <a href="${cert.file_path}" class="btn btn-sm btn-secondary" target="_blank" download title="Download">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        <form method="POST" action="/admin/certificates/delete/${cert.id}" style="display:inline;" onsubmit="return confirm('Delete this certificate?');">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+`).join('') : '<tr><td colspan="4" class="text-center text-muted p-4">No certificates uploaded yet</td></tr>') + `
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer clearfix">
+                    <span class="text-muted">Total: ${certificates ? certificates.length : 0} certificates</span>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <script>
-    function previewCertificate(filePath, title) {
-      // Validate file path - must start with /uploads/ and not contain path traversal
-      if (!filePath.startsWith('/uploads/') || filePath.includes('..')) {
-        alert('Invalid file path');
-        return;
-      }
-      
-      document.getElementById('certificateTitle').textContent = title;
-      
-      const fileExt = filePath.split('.').pop().toLowerCase();
-      const allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
-      
-      if (!allowedExtensions.includes(fileExt)) {
-        alert('Unsupported file type');
-        return;
-      }
-      
-      const viewer = document.getElementById('pdfViewer');
-      
-      if (fileExt === 'pdf') {
-        viewer.src = filePath;
-      } else {
-        // For images, create an img tag instead
-        viewer.style.display = 'none';
-        const img = document.createElement('img');
-        img.src = filePath;
-        img.style.maxWidth = '100%';
-        img.style.maxHeight = 'calc(100% - 60px)';
-        img.id = 'imageViewer';
-        viewer.parentNode.insertBefore(img, viewer);
-      }
-      
-      document.getElementById('certificateModal').style.display = 'block';
-    }
     
-    function closePreview() {
-      const modal = document.getElementById('certificateModal');
-      modal.style.display = 'none';
-      
-      // Reset viewer
-      const viewer = document.getElementById('pdfViewer');
-      viewer.src = '';
-      viewer.style.display = 'block';
-      
-      // Remove image viewer if it exists
-      const imgViewer = document.getElementById('imageViewer');
-      if (imgViewer) {
-        imgViewer.remove();
-      }
-    }
-    
-    window.onclick = function(event) {
-      const modal = document.getElementById('certificateModal');
-      if (event.target == modal) {
-        closePreview();
-      }
-    }
-  </script>
-</body>
-</html>
+    <!-- EDIT HERE: Certificate Preview Modal -->
+    <div class="modal fade" id="certificateModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="certificateTitle">Certificate Preview</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0" style="height: 75vh;">
+                    <iframe id="pdfViewer" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+                    <img id="imageViewer" src="" style="width: 100%; max-height: 100%; object-fit: contain; display: none;">
+                </div>
+            </div>
+        </div>
+    </div>
+    `,
+    extraScripts: `
+    <script>
+        // EDIT HERE: Custom file input label update
+        document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+            var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file';
+            e.target.nextElementSibling.textContent = fileName;
+        });
+        
+        // EDIT HERE: Preview certificate function
+        function previewCertificate(filePath, title) {
+            // Validate file path
+            if (!filePath.startsWith('/uploads/') || filePath.includes('..')) {
+                alert('Invalid file path');
+                return;
+            }
+            
+            document.getElementById('certificateTitle').textContent = title;
+            
+            var fileExt = filePath.split('.').pop().toLowerCase();
+            var allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'webp'];
+            
+            if (!allowedExtensions.includes(fileExt)) {
+                alert('Unsupported file type');
+                return;
+            }
+            
+            var pdfViewer = document.getElementById('pdfViewer');
+            var imageViewer = document.getElementById('imageViewer');
+            
+            if (fileExt === 'pdf') {
+                pdfViewer.src = filePath;
+                pdfViewer.style.display = 'block';
+                imageViewer.style.display = 'none';
+            } else {
+                imageViewer.src = filePath;
+                imageViewer.style.display = 'block';
+                pdfViewer.style.display = 'none';
+            }
+            
+            $('#certificateModal').modal('show');
+        }
+        
+        $('#certificateModal').on('hidden.bs.modal', function() {
+            document.getElementById('pdfViewer').src = '';
+            document.getElementById('imageViewer').src = '';
+        });
+    </script>
+    `
+}) %>
