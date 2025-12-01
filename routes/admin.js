@@ -8,6 +8,24 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+// Log session activity for security tracking
+function logSessionActivity(userId, action, req) {
+  try {
+    const stmt = db.prepare(`
+      INSERT INTO session_log (user_id, action, ip_address, user_agent)
+      VALUES (?, ?, ?, ?)
+    `);
+    stmt.run(
+      userId,
+      action,
+      req.ip || req.connection.remoteAddress,
+      req.headers['user-agent']
+    );
+  } catch (err) {
+    console.error('Error logging session activity:', err);
+  }
+}
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -89,6 +107,9 @@ router.post('/login',
         username: user.username
       };
 
+      // Log successful login
+      logSessionActivity(user.id, 'login', req);
+
       res.redirect('/admin/dashboard');
     } catch (err) {
       console.error(err);
@@ -102,6 +123,9 @@ router.post('/login',
 
 // Logout
 router.get('/logout', (req, res) => {
+  if (req.session && req.session.user) {
+    logSessionActivity(req.session.user.id, 'logout', req);
+  }
   req.session.destroy();
   res.redirect('/admin/login');
 });
@@ -1229,24 +1253,6 @@ router.post('/forgot-password',
     });
   }
 );
-
-// Log session activity
-function logSessionActivity(userId, action, req) {
-  try {
-    const stmt = db.prepare(`
-      INSERT INTO session_log (user_id, action, ip_address, user_agent)
-      VALUES (?, ?, ?, ?)
-    `);
-    stmt.run(
-      userId,
-      action,
-      req.ip || req.connection.remoteAddress,
-      req.headers['user-agent']
-    );
-  } catch (err) {
-    console.error('Error logging session activity:', err);
-  }
-}
 
 // Redirect /admin to dashboard
 router.get('/', requireAuth, (req, res) => {

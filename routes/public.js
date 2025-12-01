@@ -153,7 +153,7 @@ router.get('/projects', (req, res) => {
     }
     
     // Get all unique categories for filtering
-    const categories = db.prepare('SELECT DISTINCT category FROM projects WHERE category IS NOT NULL AND category != ""').all();
+    const categories = db.prepare("SELECT DISTINCT category FROM projects WHERE category IS NOT NULL AND category != ''").all();
     const clients = db.prepare('SELECT * FROM clients ORDER BY order_index ASC').all();
     const contactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
 
