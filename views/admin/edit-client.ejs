@@ -1,2 +1,82 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title><%= title %></title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/admin.css"></head><body class="admin-body"><%- include('../partials/admin-header') %><div class="admin-container"><%- include('../partials/admin-sidebar') %><main class="admin-main"><div class="admin-content"><h1><%= title %></h1><% if (locals.success && success) { %><div class="alert alert-success">Client saved!</div><% } %><% if (locals.errors && errors.length > 0) { %><div class="alert alert-error"><ul><% errors.forEach(e => { %><li><%= e.msg %></li><% }); %></ul></div><% } %><form method="POST" enctype="multipart/form-data" class="admin-form"><div class="form-group"><label>Client Name *</label><input type="text" name="name" value="<%= client ? client.name : '' %>" required></div><div class="form-group"><label>Description</label><textarea name="description" rows="4"><%= client ? client.description || '' : '' %></textarea></div><div class="form-group"><label>Logo</label><input type="file" name="logo" accept="image/*"><input type="hidden" name="uploadType" value="images"><% if (client && client.logo) { %><img src="<%= client.logo %>" style="max-width:150px;margin-top:10px;"><% } %></div><div class="form-group"><label>Order</label><input type="number" name="order_index" value="<%= client ? client.order_index : 0 %>"></div><div class="form-actions"><button type="submit" class="btn btn-primary">Save</button><a href="/admin/clients" class="btn btn-secondary">Cancel</a></div></form></div></main></div></body></html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+    <%- include('../partials/admin-header') %>
+    <div class="admin-container">
+        <%- include('../partials/admin-sidebar') %>
+        <main class="admin-main">
+            <div class="admin-content">
+                <div class="content-header">
+                    <h1><%= title %></h1>
+                    <a href="/admin/clients" class="btn btn-secondary">← Back to Clients</a>
+                </div>
+                
+                <% if (success) { %>
+                <div class="alert alert-success">Client saved successfully!</div>
+                <% } %>
+                
+                <% if (errors && errors.length > 0) { %>
+                <div class="alert alert-error">
+                    <ul><% errors.forEach(function(e) { %><li><%= e.msg %></li><% }); %></ul>
+                </div>
+                <% } %>
+                
+                <form method="POST" enctype="multipart/form-data" class="admin-form">
+                    <input type="hidden" name="uploadType" value="images">
+                    
+                    <div class="form-group">
+                        <label>Client Name *</label>
+                        <input type="text" name="name" value="<%= client ? client.name : '' %>" required>
+                        <small>This will also be used to generate the URL slug</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Short Description</label>
+                        <textarea name="description" rows="3" placeholder="Brief description for client cards"><%= client ? client.description || '' : '' %></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Detailed Description (HTML allowed)</label>
+                        <textarea name="detailed_description" rows="8" placeholder="Full description for the client detail page. You can use HTML tags."><%= client ? client.detailed_description || '' : '' %></textarea>
+                        <small>This content will appear on the client detail page. You can include HTML formatting.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Website URL</label>
+                        <input type="url" name="website" value="<%= client ? client.website || '' : '' %>" placeholder="https://www.example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Logo</label>
+                        <% if (client && client.logo) { %>
+                        <div style="margin-bottom: 10px;">
+                            <img src="<%= client.logo %>" alt="Current logo" style="max-width: 150px; border-radius: 8px; border: 1px solid #ddd; padding: 5px;">
+                        </div>
+                        <% } %>
+                        <input type="file" name="logo" accept="image/*">
+                        <small>Recommended: PNG with transparent background, 200x200px</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Display Order</label>
+                        <input type="number" name="order_index" value="<%= client ? client.order_index : 0 %>" min="0">
+                        <small>Lower numbers appear first</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><%= client ? 'Update' : 'Add' %> Client</button>
+                        <a href="/admin/clients" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

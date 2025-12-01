@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin Panel</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+    <%- include('../partials/admin-header') %>
+    
+    <div class="admin-container">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <main class="admin-main">
+            <div class="admin-content">
+                <div class="content-header">
+                    <h1><%= title %></h1>
+                    <a href="/admin/team" class="btn btn-secondary">← Back to Team</a>
+                </div>
+
+                <% if (success) { %>
+                <div class="alert alert-success">Team member saved successfully!</div>
+                <% } %>
+
+                <% if (errors && errors.length > 0) { %>
+                <div class="alert alert-error">
+                    <ul>
+                        <% errors.forEach(function(error) { %>
+                        <li><%= error.msg %></li>
+                        <% }); %>
+                    </ul>
+                </div>
+                <% } %>
+
+                <form method="POST" action="/admin/team/<%= member ? 'edit/' + member.id : 'add' %>" enctype="multipart/form-data" class="admin-form">
+                    <div class="form-group">
+                        <label for="name">Name *</label>
+                        <input type="text" id="name" name="name" value="<%= member ? member.name : '' %>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="position">Position</label>
+                        <input type="text" id="position" name="position" value="<%= member ? member.position || '' : '' %>" placeholder="e.g., Project Manager">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" name="bio" rows="4" placeholder="Brief description about the team member"><%= member ? member.bio || '' : '' %></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="<%= member ? member.email || '' : '' %>" placeholder="email@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" name="phone" value="<%= member ? member.phone || '' : '' %>" placeholder="+91-XXXXXXXXXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo">Photo</label>
+                        <% if (member && member.photo) { %>
+                        <div style="margin-bottom: 10px;">
+                            <img src="<%= member.photo %>" alt="Current photo" style="max-width: 150px; border-radius: 8px;">
+                        </div>
+                        <% } %>
+                        <input type="file" id="photo" name="photo" accept="image/*">
+                        <small>Recommended: 400x400px square image</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="order_index">Display Order</label>
+                        <input type="number" id="order_index" name="order_index" value="<%= member ? member.order_index : 0 %>" min="0">
+                        <small>Lower numbers appear first</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><%= member ? 'Update' : 'Add' %> Team Member</button>
+                        <a href="/admin/team" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

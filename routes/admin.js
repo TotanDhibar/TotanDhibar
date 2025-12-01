@@ -240,9 +240,11 @@ router.get('/services/add', requireAuth, (req, res) => {
 
 router.post('/services/add',
   requireAuth,
+  upload.single('image'),
   [
     body('name').trim().notEmpty().withMessage('Service name is required'),
     body('description').optional().trim(),
+    body('detailed_description').optional().trim(),
     body('icon').optional().trim(),
     body('order_index').optional().isInt()
   ],
@@ -259,12 +261,16 @@ router.post('/services/add',
     }
 
     try {
-      const { name, description, icon, order_index } = req.body;
+      const { name, description, detailed_description, icon, order_index } = req.body;
+      // Generate slug from name
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const image = req.file ? '/uploads/images/' + req.file.filename : null;
+      
       const stmt = db.prepare(`
-        INSERT INTO services (name, description, icon, order_index)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO services (name, slug, description, detailed_description, icon, image, order_index)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
-      stmt.run(name, description || null, icon || null, order_index || 0);
+      stmt.run(name, slug, description || null, detailed_description || null, icon || null, image, order_index || 0);
 
       res.redirect('/admin/services');
     } catch (err) {
@@ -299,9 +305,11 @@ router.get('/services/edit/:id', requireAuth, (req, res) => {
 
 router.post('/services/edit/:id',
   requireAuth,
+  upload.single('image'),
   [
     body('name').trim().notEmpty().withMessage('Service name is required'),
     body('description').optional().trim(),
+    body('detailed_description').optional().trim(),
     body('icon').optional().trim(),
     body('order_index').optional().isInt()
   ],
@@ -318,18 +326,27 @@ router.post('/services/edit/:id',
     }
 
     try {
-      const { name, description, icon, order_index } = req.body;
+      const { name, description, detailed_description, icon, order_index } = req.body;
+      const service = db.prepare('SELECT * FROM services WHERE id = ?').get(req.params.id);
+      
+      // Generate slug from name
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      let image = service.image;
+      if (req.file) {
+        image = '/uploads/images/' + req.file.filename;
+      }
+      
       const stmt = db.prepare(`
         UPDATE services 
-        SET name = ?, description = ?, icon = ?, order_index = ?
+        SET name = ?, slug = ?, description = ?, detailed_description = ?, icon = ?, image = ?, order_index = ?
         WHERE id = ?
       `);
-      stmt.run(name, description || null, icon || null, order_index || 0, req.params.id);
+      stmt.run(name, slug, description || null, detailed_description || null, icon || null, image, order_index || 0, req.params.id);
 
-      const service = db.prepare('SELECT * FROM services WHERE id = ?').get(req.params.id);
+      const updatedService = db.prepare('SELECT * FROM services WHERE id = ?').get(req.params.id);
       res.render('admin/edit-service', {
         title: 'Edit Service',
-        service,
+        service: updatedService,
         errors: [],
         success: true
       });
@@ -384,6 +401,8 @@ router.post('/clients/add',
   [
     body('name').trim().notEmpty().withMessage('Client name is required'),
     body('description').optional().trim(),
+    body('detailed_description').optional().trim(),
+    body('website').optional().trim(),
     body('order_index').optional().isInt()
   ],
   (req, res) => {
@@ -399,14 +418,16 @@ router.post('/clients/add',
     }
 
     try {
-      const { name, description, order_index } = req.body;
+      const { name, description, detailed_description, website, order_index } = req.body;
       const logo = req.file ? '/uploads/images/' + req.file.filename : null;
+      // Generate slug from name
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       
       const stmt = db.prepare(`
-        INSERT INTO clients (name, description, logo, order_index)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO clients (name, slug, description, detailed_description, website, logo, order_index)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
-      stmt.run(name, description || null, logo, order_index || 0);
+      stmt.run(name, slug, description || null, detailed_description || null, website || null, logo, order_index || 0);
 
       res.redirect('/admin/clients');
     } catch (err) {
@@ -445,6 +466,8 @@ router.post('/clients/edit/:id',
   [
     body('name').trim().notEmpty().withMessage('Client name is required'),
     body('description').optional().trim(),
+    body('detailed_description').optional().trim(),
+    body('website').optional().trim(),
     body('order_index').optional().isInt()
   ],
   (req, res) => {
@@ -460,9 +483,11 @@ router.post('/clients/edit/:id',
     }
 
     try {
-      const { name, description, order_index } = req.body;
+      const { name, description, detailed_description, website, order_index } = req.body;
       const client = db.prepare('SELECT * FROM clients WHERE id = ?').get(req.params.id);
       
+      // Generate slug from name
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       let logo = client.logo;
       if (req.file) {
         logo = '/uploads/images/' + req.file.filename;
@@ -470,10 +495,10 @@ router.post('/clients/edit/:id',
 
       const stmt = db.prepare(`
         UPDATE clients 
-        SET name = ?, description = ?, logo = ?, order_index = ?
+        SET name = ?, slug = ?, description = ?, detailed_description = ?, website = ?, logo = ?, order_index = ?
         WHERE id = ?
       `);
-      stmt.run(name, description || null, logo, order_index || 0, req.params.id);
+      stmt.run(name, slug, description || null, detailed_description || null, website || null, logo, order_index || 0, req.params.id);
 
       const updatedClient = db.prepare('SELECT * FROM clients WHERE id = ?').get(req.params.id);
       res.render('admin/edit-client', {
@@ -743,7 +768,9 @@ router.post('/contact-info',
     body('phone').optional().trim(),
     body('email').optional().isEmail().withMessage('Valid email is required'),
     body('address').optional().trim(),
-    body('location').optional().trim()
+    body('location').optional().trim(),
+    body('gst_number').optional().trim(),
+    body('google_map_embed').optional().trim()
   ],
   (req, res) => {
     const errors = validationResult(req);
@@ -758,7 +785,7 @@ router.post('/contact-info',
     }
 
     try {
-      const { company_name, phone, email, address, location } = req.body;
+      const { company_name, phone, email, address, location, gst_number, google_map_embed } = req.body;
       const contactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
       
       let company_logo = contactInfo ? contactInfo.company_logo : null;
@@ -774,10 +801,10 @@ router.post('/contact-info',
 
       const stmt = db.prepare(`
         UPDATE contact_info 
-        SET company_name = ?, company_logo = ?, background_image = ?, phone = ?, email = ?, address = ?, location = ?, updated_at = CURRENT_TIMESTAMP
+        SET company_name = ?, company_logo = ?, background_image = ?, phone = ?, email = ?, address = ?, location = ?, gst_number = ?, google_map_embed = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = 1
       `);
-      stmt.run(company_name, company_logo, background_image, phone || null, email || null, address || null, location || null);
+      stmt.run(company_name, company_logo, background_image, phone || null, email || null, address || null, location || null, gst_number || null, google_map_embed || null);
 
       const updatedContactInfo = db.prepare('SELECT * FROM contact_info WHERE id = 1').get();
       res.render('admin/contact-info', {
@@ -897,6 +924,329 @@ router.post('/change-password',
     }
   }
 );
+
+// ===== TEAM MANAGEMENT =====
+router.get('/team', requireAuth, (req, res) => {
+  try {
+    const teamMembers = db.prepare('SELECT * FROM team_members ORDER BY order_index ASC').all();
+    res.render('admin/team', {
+      title: 'Manage Team',
+      teamMembers
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error loading team members');
+  }
+});
+
+router.get('/team/add', requireAuth, (req, res) => {
+  res.render('admin/edit-team', {
+    title: 'Add Team Member',
+    member: null,
+    errors: [],
+    success: false
+  });
+});
+
+router.post('/team/add',
+  requireAuth,
+  upload.single('photo'),
+  [
+    body('name').trim().notEmpty().withMessage('Name is required'),
+    body('position').optional().trim(),
+    body('bio').optional().trim(),
+    body('email').optional().isEmail().withMessage('Valid email required'),
+    body('phone').optional().trim(),
+    body('order_index').optional().isInt()
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+      return res.render('admin/edit-team', {
+        title: 'Add Team Member',
+        member: req.body,
+        errors: errors.array(),
+        success: false
+      });
+    }
+
+    try {
+      const { name, position, bio, email, phone, order_index } = req.body;
+      const photo = req.file ? '/uploads/images/' + req.file.filename : null;
+      
+      const stmt = db.prepare(`
+        INSERT INTO team_members (name, position, bio, photo, email, phone, order_index)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
+      stmt.run(name, position || null, bio || null, photo, email || null, phone || null, order_index || 0);
+
+      res.redirect('/admin/team');
+    } catch (err) {
+      console.error(err);
+      res.render('admin/edit-team', {
+        title: 'Add Team Member',
+        member: req.body,
+        errors: [{ msg: 'Error adding team member' }],
+        success: false
+      });
+    }
+  }
+);
+
+router.get('/team/edit/:id', requireAuth, (req, res) => {
+  try {
+    const member = db.prepare('SELECT * FROM team_members WHERE id = ?').get(req.params.id);
+    if (!member) {
+      return res.redirect('/admin/team');
+    }
+    res.render('admin/edit-team', {
+      title: 'Edit Team Member',
+      member,
+      errors: [],
+      success: false
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error loading team member');
+  }
+});
+
+router.post('/team/edit/:id',
+  requireAuth,
+  upload.single('photo'),
+  [
+    body('name').trim().notEmpty().withMessage('Name is required'),
+    body('position').optional().trim(),
+    body('bio').optional().trim(),
+    body('email').optional().isEmail().withMessage('Valid email required'),
+    body('phone').optional().trim(),
+    body('order_index').optional().isInt()
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+      return res.render('admin/edit-team', {
+        title: 'Edit Team Member',
+        member: { id: req.params.id, ...req.body },
+        errors: errors.array(),
+        success: false
+      });
+    }
+
+    try {
+      const { name, position, bio, email, phone, order_index } = req.body;
+      const member = db.prepare('SELECT * FROM team_members WHERE id = ?').get(req.params.id);
+      
+      let photo = member.photo;
+      if (req.file) {
+        photo = '/uploads/images/' + req.file.filename;
+      }
+
+      const stmt = db.prepare(`
+        UPDATE team_members 
+        SET name = ?, position = ?, bio = ?, photo = ?, email = ?, phone = ?, order_index = ?
+        WHERE id = ?
+      `);
+      stmt.run(name, position || null, bio || null, photo, email || null, phone || null, order_index || 0, req.params.id);
+
+      const updatedMember = db.prepare('SELECT * FROM team_members WHERE id = ?').get(req.params.id);
+      res.render('admin/edit-team', {
+        title: 'Edit Team Member',
+        member: updatedMember,
+        errors: [],
+        success: true
+      });
+    } catch (err) {
+      console.error(err);
+      res.render('admin/edit-team', {
+        title: 'Edit Team Member',
+        member: { id: req.params.id, ...req.body },
+        errors: [{ msg: 'Error updating team member' }],
+        success: false
+      });
+    }
+  }
+);
+
+router.post('/team/delete/:id', requireAuth, (req, res) => {
+  try {
+    db.prepare('DELETE FROM team_members WHERE id = ?').run(req.params.id);
+    res.redirect('/admin/team');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/team');
+  }
+});
+
+// ===== HOME PAGE CONFIGURATION =====
+router.get('/home-config', requireAuth, (req, res) => {
+  try {
+    const homeConfig = db.prepare('SELECT * FROM home_config WHERE id = 1').get();
+    res.render('admin/home-config', {
+      title: 'Home Page Configuration',
+      homeConfig,
+      errors: [],
+      success: false
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error loading home configuration');
+  }
+});
+
+router.post('/home-config',
+  requireAuth,
+  upload.single('hero_background'),
+  [
+    body('hero_title').optional().trim(),
+    body('hero_subtitle').optional().trim(),
+    body('animated_text').optional().trim(),
+    body('stat1_label').optional().trim(),
+    body('stat1_value').optional().isInt(),
+    body('stat2_label').optional().trim(),
+    body('stat2_value').optional().isInt(),
+    body('stat3_label').optional().trim(),
+    body('stat3_value').optional().isInt(),
+    body('stat4_label').optional().trim(),
+    body('stat4_value').optional().isInt()
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+      return res.render('admin/home-config', {
+        title: 'Home Page Configuration',
+        homeConfig: { id: 1, ...req.body },
+        errors: errors.array(),
+        success: false
+      });
+    }
+
+    try {
+      const { hero_title, hero_subtitle, animated_text, stat1_label, stat1_value, stat2_label, stat2_value, stat3_label, stat3_value, stat4_label, stat4_value } = req.body;
+      const homeConfig = db.prepare('SELECT * FROM home_config WHERE id = 1').get();
+      
+      let hero_background = homeConfig ? homeConfig.hero_background : null;
+      if (req.file) {
+        hero_background = '/uploads/images/' + req.file.filename;
+      }
+
+      const stmt = db.prepare(`
+        UPDATE home_config 
+        SET hero_title = ?, hero_subtitle = ?, hero_background = ?, animated_text = ?,
+            stat1_label = ?, stat1_value = ?, stat2_label = ?, stat2_value = ?,
+            stat3_label = ?, stat3_value = ?, stat4_label = ?, stat4_value = ?,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = 1
+      `);
+      stmt.run(
+        hero_title || 'UCC Engineering Contractors',
+        hero_subtitle || 'Excellence in Power Plant Maintenance & Engineering',
+        hero_background,
+        animated_text || 'Power Plant Maintenance|Industrial Engineering|Quality Services',
+        stat1_label || 'Projects Completed',
+        stat1_value || 500,
+        stat2_label || 'Happy Clients',
+        stat2_value || 50,
+        stat3_label || 'Years Experience',
+        stat3_value || 15,
+        stat4_label || 'Team Members',
+        stat4_value || 100
+      );
+
+      const updatedConfig = db.prepare('SELECT * FROM home_config WHERE id = 1').get();
+      res.render('admin/home-config', {
+        title: 'Home Page Configuration',
+        homeConfig: updatedConfig,
+        errors: [],
+        success: true
+      });
+    } catch (err) {
+      console.error(err);
+      res.render('admin/home-config', {
+        title: 'Home Page Configuration',
+        homeConfig: { id: 1, ...req.body },
+        errors: [{ msg: 'Error updating home configuration' }],
+        success: false
+      });
+    }
+  }
+);
+
+// ===== ADMIN SETTINGS (Security) =====
+router.get('/settings', requireAuth, (req, res) => {
+  try {
+    const sessionLogs = db.prepare(`
+      SELECT * FROM session_log 
+      ORDER BY created_at DESC 
+      LIMIT 20
+    `).all();
+    
+    res.render('admin/settings', {
+      title: 'Admin Settings',
+      sessionLogs,
+      errors: [],
+      success: false
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error loading settings');
+  }
+});
+
+// Forgot password (dummy implementation)
+router.get('/forgot-password', requireGuest, (req, res) => {
+  res.render('admin/forgot-password', {
+    title: 'Forgot Password',
+    error: null,
+    success: false
+  });
+});
+
+router.post('/forgot-password',
+  requireGuest,
+  [
+    body('email').isEmail().withMessage('Valid email is required')
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+      return res.render('admin/forgot-password', {
+        title: 'Forgot Password',
+        error: 'Please provide a valid email address',
+        success: false
+      });
+    }
+
+    // Dummy implementation - in production, this would send an email
+    res.render('admin/forgot-password', {
+      title: 'Forgot Password',
+      error: null,
+      success: true
+    });
+  }
+);
+
+// Log session activity
+function logSessionActivity(userId, action, req) {
+  try {
+    const stmt = db.prepare(`
+      INSERT INTO session_log (user_id, action, ip_address, user_agent)
+      VALUES (?, ?, ?, ?)
+    `);
+    stmt.run(
+      userId,
+      action,
+      req.ip || req.connection.remoteAddress,
+      req.headers['user-agent']
+    );
+  } catch (err) {
+    console.error('Error logging session activity:', err);
+  }
+}
 
 // Redirect /admin to dashboard
 router.get('/', requireAuth, (req, res) => {

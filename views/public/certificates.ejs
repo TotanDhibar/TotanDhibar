@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - UCC Engineering</title>
+    <title><%= title %> - <%= contactInfo ? contactInfo.company_name : 'UCC Engineering' %></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <%- include('../partials/header') %>
+    <%- include('../partials/header', { contactInfo }) %>
     
     <main>
         <section class="page-header">
@@ -17,19 +17,19 @@
             </div>
         </section>
 
-        <% if (locals.certificates && certificates.length > 0) { %>
-        <section class="certificates-section">
+        <% if (certificates && certificates.length > 0) { %>
+        <section class="certificates-section" style="padding: 60px 0;">
             <div class="container">
-                <h2>Our Certificates</h2>
+                <h2 class="section-title">Our Certificates</h2>
                 <div class="certificates-list">
-                    <% certificates.forEach(cert => { %>
-                    <div class="certificate-card">
+                    <% certificates.forEach(function(cert, index) { %>
+                    <div class="certificate-card animate-fade-in" style="animation-delay: <%= index * 0.1 %>s">
                         <div class="certificate-icon">📄</div>
                         <h3><%= cert.title %></h3>
                         <% if (cert.description) { %>
                         <p><%= cert.description %></p>
                         <% } %>
-                        <a href="<%= cert.file_path %>" class="btn btn-small" target="_blank" download>Download PDF</a>
+                        <a href="<%= cert.file_path %>" class="btn btn-primary btn-small" target="_blank" download>Download PDF</a>
                         <p class="upload-date">Uploaded: <%= new Date(cert.upload_date).toLocaleDateString() %></p>
                     </div>
                     <% }); %>
@@ -38,13 +38,13 @@
         </section>
         <% } %>
 
-        <% if (locals.downloads && downloads.length > 0) { %>
-        <section class="downloads-section">
+        <% if (downloads && downloads.length > 0) { %>
+        <section class="downloads-section" style="padding: 60px 0; background: #f8f9fa;">
             <div class="container">
-                <h2>Downloads</h2>
+                <h2 class="section-title">Downloads</h2>
                 <div class="downloads-list">
-                    <% downloads.forEach(download => { %>
-                    <div class="download-card">
+                    <% downloads.forEach(function(download, index) { %>
+                    <div class="download-card animate-fade-in" style="animation-delay: <%= index * 0.1 %>s">
                         <div class="download-icon">📁</div>
                         <h3><%= download.title %></h3>
                         <% if (download.category) { %>
@@ -53,16 +53,24 @@
                         <% if (download.description) { %>
                         <p><%= download.description %></p>
                         <% } %>
-                        <a href="<%= download.file_path %>" class="btn btn-small" target="_blank" download>Download</a>
+                        <a href="<%= download.file_path %>" class="btn btn-primary btn-small" target="_blank" download>Download</a>
                     </div>
                     <% }); %>
                 </div>
             </div>
         </section>
         <% } %>
+
+        <% if ((!certificates || certificates.length === 0) && (!downloads || downloads.length === 0)) { %>
+        <section style="padding: 80px 0; text-align: center;">
+            <div class="container">
+                <p>No certificates or downloads available at this time. Please check back later.</p>
+            </div>
+        </section>
+        <% } %>
     </main>
     
-    <%- include('../partials/footer') %>
+    <%- include('../partials/footer', { contactInfo }) %>
     
     <script src="/js/main.js"></script>
 </body>

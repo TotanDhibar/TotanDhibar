@@ -22,33 +22,66 @@ UCC Engineering Contractors is a professional engineering company based in Asans
 - **Database:** SQLite (easily upgradeable to MySQL)
 - **Template Engine:** EJS (Embedded JavaScript)
 - **Authentication:** bcryptjs with session management
-- **File Upload:** Multer
+- **File Upload:** Multer with Sharp image processing
+- **Image Processing:** Sharp for auto-resize and optimization
 - **Security:** CSRF protection, password hashing, input validation
-- **CSS:** Custom responsive CSS with mobile-first design
+- **CSS:** Custom responsive CSS with animations and modern styling
 
 ## ✨ Features
 
 ### Public Website
-- **Home Page** - Dynamic content with services and clients showcase
-- **About Us** - Company information and mission
-- **Services** - Comprehensive list of engineering services
-- **Projects & Clients** - Portfolio with client logos and project details
+- **Home Page** - Dynamic hero section, animated text, statistics counter
+- **About Us** - Company information with team members section
+- **Services** - Comprehensive services list with individual detail pages (`/services/:slug`)
+- **Clients** - Client showcase with individual detail pages (`/clients/:slug`)
+- **Projects Gallery** - Image gallery with category filtering and lightbox preview
 - **Certificates & Downloads** - PDF certificates and downloadable documents
-- **Contact Form** - Functional contact form with validation
-- **Responsive Design** - Mobile-friendly industrial blue/white theme
+- **Contact Form** - Functional contact form with Google Maps embed support
+- **Responsive Design** - Mobile-friendly with modern animations
 
 ### Admin Panel (CMS)
-- **Secure Login** - Password-protected admin access
+- **Secure Login** - Password-protected with forgot password feature
 - **Dashboard** - Overview with statistics and recent submissions
+- **Home Page Config** - Customize hero, animated text, and statistics
 - **Page Management** - Edit home and about page content
-- **Services Management** - Add/Edit/Delete services
-- **Clients Management** - Manage client list with logo uploads
-- **Projects Management** - Add projects with images
+- **Services Management** - Add/Edit/Delete services with images and detailed descriptions
+- **Clients Management** - Manage clients with logos, websites, and detailed info
+- **Projects Management** - Add projects with categories for gallery filtering
+- **Team Management** - Add/Edit/Delete team members with photos
 - **Certificates Upload** - Upload and manage PDF certificates
 - **Downloads Manager** - Manage downloadable documents
-- **Contact Info Editor** - Update company contact information
+- **Company Info** - Update contact info, GST number, Google Maps embed
 - **Submissions Viewer** - View and manage contact form submissions
+- **Settings** - Admin settings with session activity log
 - **Password Change** - Secure password update functionality
+
+### Dynamic URL Structure
+```
+/                   → Homepage with hero, stats, and previews
+/about              → About us with team members
+/services           → All services list
+/services/:slug     → Individual service detail page
+/clients            → All clients list
+/clients/:slug      → Individual client detail page
+/projects           → Project gallery with category filter
+/certificates       → Certificates and downloads
+/contact            → Contact form with Google Maps
+
+Admin Panel:
+/admin/login        → Admin login
+/admin/dashboard    → Dashboard overview
+/admin/home-config  → Home page configuration
+/admin/pages        → Page content editor
+/admin/services     → Services manager
+/admin/clients      → Clients manager
+/admin/projects     → Projects manager
+/admin/team         → Team members manager
+/admin/certificates → Certificates manager
+/admin/downloads    → Downloads manager
+/admin/contact-info → Company information
+/admin/submissions  → Contact form submissions
+/admin/settings     → Admin settings
+```
 
 ## 📦 Installation
 

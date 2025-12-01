@@ -3,68 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - UCC Engineering</title>
+    <title><%= title %> - <%= contactInfo ? contactInfo.company_name : 'UCC Engineering' %></title>
+    <meta name="description" content="View our project gallery - successful engineering projects completed by UCC Engineering Contractors">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <%- include('../partials/header') %>
+    <%- include('../partials/header', { contactInfo }) %>
     
     <main>
         <section class="page-header">
             <div class="container">
                 <h1><%= title %></h1>
-                <p>Our work and valued partnerships</p>
+                <p>Explore our portfolio of successful engineering projects</p>
             </div>
         </section>
 
-        <% if (locals.projects && projects.length > 0) { %>
-        <section class="projects-section">
+        <!-- Category Filter -->
+        <section class="filter-section">
             <div class="container">
-                <h2>Our Projects</h2>
-                <div class="projects-grid">
-                    <% projects.forEach(project => { %>
-                    <div class="project-card">
+                <div class="filter-buttons">
+                    <a href="/projects" class="filter-btn <%= activeCategory === 'all' ? 'active' : '' %>">All</a>
+                    <% if (categories && categories.length > 0) { %>
+                        <% categories.forEach(function(cat) { %>
+                        <a href="/projects?category=<%= encodeURIComponent(cat) %>" class="filter-btn <%= activeCategory === cat ? 'active' : '' %>"><%= cat %></a>
+                        <% }); %>
+                    <% } %>
+                </div>
+            </div>
+        </section>
+
+        <% if (projects && projects.length > 0) { %>
+        <section class="gallery-section">
+            <div class="container">
+                <div class="gallery-grid">
+                    <% projects.forEach(function(project, index) { %>
+                    <div class="gallery-item animate-fade-in" style="animation-delay: <%= index * 0.05 %>s" data-category="<%= project.category || 'general' %>">
                         <% if (project.image) { %>
-                        <img src="<%= project.image %>" alt="<%= project.title %>">
+                        <div class="gallery-image" onclick="openLightbox('<%= project.image %>', '<%= project.title %>')">
+                            <img src="<%= project.image %>" alt="<%= project.title %>" loading="lazy">
+                            <div class="gallery-overlay">
+                                <span class="zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                        <% } else { %>
+                        <div class="gallery-image no-image">
+                            <div class="placeholder-image">
+                                <span>📷</span>
+                            </div>
+                        </div>
                         <% } %>
-                        <div class="project-content">
+                        <div class="gallery-info">
                             <h3><%= project.title %></h3>
                             <% if (project.client_name) { %>
                             <p class="project-client">Client: <%= project.client_name %></p>
                             <% } %>
-                            <p><%= project.description %></p>
-                            <% if (project.completion_date) { %>
-                            <p class="project-date">Completed: <%= new Date(project.completion_date).toLocaleDateString() %></p>
+                            <% if (project.description) { %>
+                            <p class="project-desc"><%= project.description.substring(0, 100) %><%= project.description.length > 100 ? '...' : '' %></p>
                             <% } %>
+                            <div class="project-meta">
+                                <% if (project.category) { %>
+                                <span class="category-badge"><%= project.category %></span>
+                                <% } %>
+                                <% if (project.completion_date) { %>
+                                <span class="project-date"><%= new Date(project.completion_date).toLocaleDateString() %></span>
+                                <% } %>
+                            </div>
                         </div>
                     </div>
                     <% }); %>
                 </div>
             </div>
         </section>
+        <% } else { %>
+        <section class="no-projects-section">
+            <div class="container text-center">
+                <p>No projects found in this category. <a href="/projects">View all projects</a></p>
+            </div>
+        </section>
         <% } %>
 
-        <% if (locals.clients && clients.length > 0) { %>
+        <% if (clients && clients.length > 0) { %>
         <section class="clients-section">
             <div class="container">
-                <h2>Our Valued Clients</h2>
+                <h2 class="section-title">Our Valued Clients</h2>
                 <div class="clients-list">
-                    <% clients.forEach(client => { %>
-                    <div class="client-card">
+                    <% clients.forEach(function(client) { %>
+                    <a href="/clients/<%= client.slug %>" class="client-card">
                         <% if (client.logo) { %>
                         <img src="<%= client.logo %>" alt="<%= client.name %>">
+                        <% } else { %>
+                        <div class="client-initial"><%= client.name.charAt(0) %></div>
                         <% } %>
                         <h4><%= client.name %></h4>
-                        <p><%= client.description %></p>
-                    </div>
+                    </a>
                     <% }); %>
                 </div>
             </div>
         </section>
         <% } %>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Have a Project in Mind?</h2>
+                <p>Let's discuss how we can help you achieve your goals.</p>
+                <a href="/contact" class="btn btn-light">Get in Touch</a>
+            </div>
+        </section>
     </main>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="">
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
     
-    <%- include('../partials/footer') %>
+    <%- include('../partials/footer', { contactInfo }) %>
     
     <script src="/js/main.js"></script>
 </body>

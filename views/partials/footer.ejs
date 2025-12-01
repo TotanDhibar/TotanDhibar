@@ -2,16 +2,16 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-section">
-                <h3><%= locals.contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %></h3>
+                <h3><%= contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %></h3>
                 <p>Professional power plant maintenance and engineering solutions.</p>
             </div>
-            <% if (locals.contactInfo) { %>
+            <% if (contactInfo) { %>
             <div class="footer-section">
                 <h4>Contact Us</h4>
-                <p><%= contactInfo.address %></p>
-                <p><%= contactInfo.location %></p>
-                <p>Phone: <%= contactInfo.phone %></p>
-                <p>Email: <%= contactInfo.email %></p>
+                <% if (contactInfo.address) { %><p><%= contactInfo.address %></p><% } %>
+                <% if (contactInfo.location) { %><p><%= contactInfo.location %></p><% } %>
+                <% if (contactInfo.phone) { %><p>Phone: <a href="tel:<%= contactInfo.phone %>"><%= contactInfo.phone %></a></p><% } %>
+                <% if (contactInfo.email) { %><p>Email: <a href="mailto:<%= contactInfo.email %>"><%= contactInfo.email %></a></p><% } %>
             </div>
             <% } %>
             <div class="footer-section">
@@ -20,12 +20,24 @@
                     <li><a href="/">Home</a></li>
                     <li><a href="/about">About</a></li>
                     <li><a href="/services">Services</a></li>
+                    <li><a href="/clients">Clients</a></li>
+                    <li><a href="/projects">Projects</a></li>
                     <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Our Services</h4>
+                <ul>
+                    <li><a href="/services/amc-annual-maintenance-contract">AMC</a></li>
+                    <li><a href="/services/boiler-maintenance">Boiler Maintenance</a></li>
+                    <li><a href="/services/esp-electrostatic-precipitator">ESP</a></li>
+                    <li><a href="/services/shutdown-services">Shutdown Services</a></li>
+                    <li><a href="/services/overhauling">Overhauling</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; <%= new Date().getFullYear() %> <%= locals.contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %>. All rights reserved.</p>
+            <p>&copy; <%= new Date().getFullYear() %> <%= contactInfo ? contactInfo.company_name : 'UCC Engineering Contractors' %>. All rights reserved.</p>
         </div>
     </div>
 </footer>

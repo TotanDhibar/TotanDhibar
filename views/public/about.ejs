@@ -3,29 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - UCC Engineering</title>
+    <title><%= title %> - <%= contactInfo ? contactInfo.company_name : 'UCC Engineering' %></title>
+    <% if (page && page.meta_description) { %>
+    <meta name="description" content="<%= page.meta_description %>">
+    <% } %>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <%- include('../partials/header') %>
+    <%- include('../partials/header', { contactInfo }) %>
     
     <main>
         <section class="page-header">
             <div class="container">
                 <h1><%= title %></h1>
+                <p>Learn more about our company and team</p>
             </div>
         </section>
 
-        <% if (locals.page) { %>
+        <% if (page) { %>
         <section class="content-section">
             <div class="container">
-                <%- page.content %>
+                <div class="about-content animate-fade-in">
+                    <%- page.content %>
+                </div>
             </div>
         </section>
         <% } %>
+
+        <!-- Team Section -->
+        <% if (teamMembers && teamMembers.length > 0) { %>
+        <section class="team-section">
+            <div class="container">
+                <h2 class="section-title">Meet Our Team</h2>
+                <p class="section-subtitle">The experts behind our success</p>
+                <div class="team-grid">
+                    <% teamMembers.forEach(function(member, index) { %>
+                    <div class="team-card animate-fade-in" style="animation-delay: <%= index * 0.1 %>s">
+                        <div class="team-photo">
+                            <% if (member.photo) { %>
+                            <img src="<%= member.photo %>" alt="<%= member.name %>">
+                            <% } else { %>
+                            <div class="team-photo-placeholder">
+                                <span><%= member.name.charAt(0) %></span>
+                            </div>
+                            <% } %>
+                        </div>
+                        <div class="team-info">
+                            <h3><%= member.name %></h3>
+                            <% if (member.position) { %>
+                            <p class="team-position"><%= member.position %></p>
+                            <% } %>
+                            <% if (member.bio) { %>
+                            <p class="team-bio"><%= member.bio %></p>
+                            <% } %>
+                            <div class="team-contact">
+                                <% if (member.email) { %>
+                                <a href="mailto:<%= member.email %>" title="Email">📧</a>
+                                <% } %>
+                                <% if (member.phone) { %>
+                                <a href="tel:<%= member.phone %>" title="Phone">📞</a>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+        </section>
+        <% } %>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Want to Work With Us?</h2>
+                <p>Join our team or partner with us for your engineering needs</p>
+                <a href="/contact" class="btn btn-light">Contact Us</a>
+            </div>
+        </section>
     </main>
     
-    <%- include('../partials/footer') %>
+    <%- include('../partials/footer', { contactInfo }) %>
     
     <script src="/js/main.js"></script>
 </body>
