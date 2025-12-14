@@ -692,7 +692,8 @@ body.dark-mode {
   }
   
   .actions-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .dark-mode-toggle {
@@ -709,6 +710,10 @@ body.dark-mode {
   
   .toast {
     min-width: auto;
+  }
+  
+  .action-card {
+    padding: 2rem 1rem;
   }
 }
 
@@ -1020,5 +1025,19 @@ body.dark-mode {
   .info-box-icon {
     margin-right: 0;
     margin-bottom: 1rem;
+  }
+  
+  /* Better mobile layout for dashboard elements */
+  .small-box {
+    margin-bottom: 1rem;
+  }
+  
+  .small-box .icon {
+    font-size: 50px;
+    top: 5px;
+  }
+  
+  .small-box h3 {
+    font-size: 1.8rem;
   }
 }
