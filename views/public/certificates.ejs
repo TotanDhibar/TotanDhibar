@@ -25,11 +25,10 @@
                     <% certificates.forEach(function(cert, index) { %>
                     <div class="certificate-card animate-fade-in" style="animation-delay: <%= index * 0.1 %>s; margin-bottom: 30px;">
                         <% 
-                        var isPdf = cert.file_path && cert.file_path.toLowerCase().endsWith('.pdf');
-                        var isImage = cert.file_path && (cert.file_path.toLowerCase().endsWith('.jpg') || 
-                                                         cert.file_path.toLowerCase().endsWith('.jpeg') || 
-                                                         cert.file_path.toLowerCase().endsWith('.png') || 
-                                                         cert.file_path.toLowerCase().endsWith('.gif'));
+                        var fileExt = cert.file_path ? cert.file_path.toLowerCase().split('.').pop() : '';
+                        var isPdf = fileExt === 'pdf';
+                        var imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+                        var isImage = imageExtensions.includes(fileExt);
                         %>
                         <div class="certificate-icon">📄</div>
                         <h3><%= cert.title %></h3>
