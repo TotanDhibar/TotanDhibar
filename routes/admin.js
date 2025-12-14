@@ -1256,6 +1256,168 @@ router.post('/forgot-password',
   }
 );
 
+// ============ EQUIPMENT MANAGEMENT ROUTES ============
+
+// Equipment list
+router.get('/equipment', requireAuth, (req, res) => {
+  try {
+    const equipment = db.prepare('SELECT * FROM equipment ORDER BY created_at DESC').all();
+    
+    // Calculate statistics
+    const equipmentStats = {
+      total: equipment.length,
+      available: equipment.filter(e => e.status === 'Available').length,
+      inUse: equipment.filter(e => e.status === 'In Use').length,
+      maintenance: equipment.filter(e => e.status === 'Under Maintenance').length
+    };
+
+    res.render('admin/equipment', {
+      title: 'Equipment Management',
+      user: req.session.user,
+      unreadCount: db.prepare('SELECT COUNT(*) as count FROM contact_submissions WHERE is_read = 0').get().count,
+      equipment,
+      equipmentStats
+    });
+  } catch (err) {
+    console.error('Error loading equipment:', err);
+    res.status(500).send('Error loading equipment');
+  }
+});
+
+// Add equipment
+router.post('/equipment/add', requireAuth, (req, res) => {
+  try {
+    const { name, category, model, serial_number, status, location, notes } = req.body;
+    
+    const stmt = db.prepare(`
+      INSERT INTO equipment (name, category, model, serial_number, status, location, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+    
+    stmt.run(name, category, model, serial_number, status || 'Available', location, notes);
+    
+    // Log activity
+    db.prepare(`
+      INSERT INTO activity_log (user_id, action, entity_type, details)
+      VALUES (?, ?, ?, ?)
+    `).run(req.session.user.id, 'create', 'equipment', `Added equipment: ${name}`);
+    
+    res.redirect('/admin/equipment');
+  } catch (err) {
+    console.error('Error adding equipment:', err);
+    res.status(500).send('Error adding equipment');
+  }
+});
+
+// ============ MAINTENANCE SCHEDULE ROUTES ============
+
+// Maintenance schedule list
+router.get('/maintenance', requireAuth, (req, res) => {
+  try {
+    const schedules = db.prepare(`
+      SELECT m.*, c.name as client_name
+      FROM maintenance_schedule m
+      LEFT JOIN clients c ON m.client_id = c.id
+      ORDER BY m.scheduled_date ASC
+    `).all();
+    
+    const clients = db.prepare('SELECT id, name FROM clients ORDER BY name').all();
+    
+    // Calculate statistics
+    const scheduleStats = {
+      total: schedules.length,
+      scheduled: schedules.filter(s => s.status === 'Scheduled').length,
+      inProgress: schedules.filter(s => s.status === 'In Progress').length,
+      completed: schedules.filter(s => s.status === 'Completed').length
+    };
+    
+    // Get upcoming schedules
+    const today = new Date().toISOString().split('T')[0];
+    const upcomingSchedules = schedules.filter(s => 
+      s.scheduled_date >= today && s.status === 'Scheduled'
+    );
+
+    res.render('admin/maintenance', {
+      title: 'Maintenance Schedule',
+      user: req.session.user,
+      unreadCount: db.prepare('SELECT COUNT(*) as count FROM contact_submissions WHERE is_read = 0').get().count,
+      schedules,
+      clients,
+      scheduleStats,
+      upcomingSchedules
+    });
+  } catch (err) {
+    console.error('Error loading maintenance schedule:', err);
+    res.status(500).send('Error loading maintenance schedule');
+  }
+});
+
+// Add maintenance schedule
+router.post('/maintenance/add', requireAuth, (req, res) => {
+  try {
+    const { client_id, service_type, scheduled_date, assigned_team, estimated_duration, status, notes } = req.body;
+    
+    const stmt = db.prepare(`
+      INSERT INTO maintenance_schedule (client_id, service_type, scheduled_date, assigned_team, estimated_duration, status, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+    
+    stmt.run(client_id, service_type, scheduled_date, assigned_team, estimated_duration, status || 'Scheduled', notes);
+    
+    // Create notification
+    db.prepare(`
+      INSERT INTO notifications (title, message, type, link)
+      VALUES (?, ?, ?, ?)
+    `).run(
+      'New Maintenance Scheduled',
+      `${service_type} scheduled for ${scheduled_date}`,
+      'info',
+      '/admin/maintenance'
+    );
+    
+    // Log activity
+    db.prepare(`
+      INSERT INTO activity_log (user_id, action, entity_type, details)
+      VALUES (?, ?, ?, ?)
+    `).run(req.session.user.id, 'create', 'maintenance', `Scheduled ${service_type}`);
+    
+    res.redirect('/admin/maintenance');
+  } catch (err) {
+    console.error('Error adding maintenance schedule:', err);
+    res.status(500).send('Error adding maintenance schedule');
+  }
+});
+
+// ============ NOTIFICATIONS ROUTES ============
+
+// Get notifications API
+router.get('/api/notifications', requireAuth, (req, res) => {
+  try {
+    const notifications = db.prepare(`
+      SELECT * FROM notifications
+      WHERE is_read = 0
+      ORDER BY created_at DESC
+      LIMIT 10
+    `).all();
+    
+    res.json(notifications);
+  } catch (err) {
+    console.error('Error fetching notifications:', err);
+    res.status(500).json({ error: 'Error fetching notifications' });
+  }
+});
+
+// Mark notification as read
+router.post('/api/notifications/:id/read', requireAuth, (req, res) => {
+  try {
+    db.prepare('UPDATE notifications SET is_read = 1 WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error marking notification as read:', err);
+    res.status(500).json({ error: 'Error updating notification' });
+  }
+});
+
 // Redirect /admin to dashboard
 router.get('/', requireAuth, (req, res) => {
   res.redirect('/admin/dashboard');
