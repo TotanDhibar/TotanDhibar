@@ -9,6 +9,10 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy - required for express-rate-limit to work correctly with X-Forwarded-For headers
+// This is important when the app is behind a reverse proxy (nginx, load balancer, etc.)
+app.set('trust proxy', 1);
+
 // Rate limiting for general API requests
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
