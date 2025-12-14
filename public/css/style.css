@@ -157,9 +157,17 @@ a:hover { color: #004499; }
 .service-detail-section { padding: 60px 0; background: #f8f9fa; }
 .service-detail-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 3rem; }
 .service-main-content { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+/* Service Content Wrapper - Image on Left Side */
+.service-content-wrapper { display: grid; grid-template-columns: 400px 1fr; gap: 2.5rem; align-items: start; }
+.service-image-left { border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.12); position: sticky; top: 20px; }
+.service-image-left img { width: 100%; height: auto; display: block; min-height: 300px; object-fit: cover; }
+
+/* Legacy image style (kept for compatibility) */
 .service-image { margin-bottom: 2rem; border-radius: 12px; overflow: hidden; }
 .service-image img { width: 100%; height: auto; }
-.service-description h2 { color: #1e3a5f; margin-bottom: 1rem; }
+
+.service-description h2 { color: #1e3a5f; margin-bottom: 1rem; margin-top: 0; }
 .service-description .lead { font-size: 1.2rem; color: #555; margin-bottom: 2rem; }
 .detailed-content h3 { color: #1e3a5f; margin: 2rem 0 1rem; }
 .detailed-content p { margin-bottom: 1rem; line-height: 1.8; }
@@ -365,6 +373,8 @@ a:hover { color: #004499; }
 @media (max-width: 992px) {
   .service-detail-grid, .client-detail-grid { grid-template-columns: 1fr; }
   .service-sidebar, .client-sidebar { order: -1; }
+  .service-content-wrapper { grid-template-columns: 1fr; gap: 2rem; }
+  .service-image-left { position: static; max-width: 100%; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .services-grid-detailed { grid-template-columns: 1fr; }
 }
