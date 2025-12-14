@@ -481,11 +481,81 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Enhance tables
-    const tables = document.querySelectorAll('.admin-table');
-    tables.forEach(table => {
-        new TableEnhancer(`#${table.id}`);
-    });
+    // Initialize DataTables on all admin tables
+    if (typeof $.fn.DataTable !== 'undefined') {
+        $('.admin-table, table.table-hover').each(function() {
+            if (!$(this).hasClass('no-datatable')) {
+                $(this).DataTable({
+                    responsive: true,
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                    dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                         '<"row"<"col-sm-12"tr>>' +
+                         '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search...",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "Showing 0 to 0 of 0 entries",
+                        infoFiltered: "(filtered from _TOTAL_ total entries)",
+                        paginate: {
+                            first: '<i class="fas fa-angle-double-left"></i>',
+                            last: '<i class="fas fa-angle-double-right"></i>',
+                            next: '<i class="fas fa-angle-right"></i>',
+                            previous: '<i class="fas fa-angle-left"></i>'
+                        }
+                    },
+                    order: [[0, 'desc']],
+                    columnDefs: [{
+                        targets: 'no-sort',
+                        orderable: false
+                    }]
+                });
+            }
+        });
+
+        // Initialize DataTables with export buttons
+        $('.datatable-export').DataTable({
+            responsive: true,
+            pageLength: 10,
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                 '<"row"<"col-sm-12 col-md-12"B>>' +
+                 '<"row"<"col-sm-12"tr>>' +
+                 '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            buttons: [
+                {
+                    extend: 'copy',
+                    className: 'btn btn-sm btn-primary',
+                    text: '<i class="fas fa-copy"></i> Copy'
+                },
+                {
+                    extend: 'csv',
+                    className: 'btn btn-sm btn-success',
+                    text: '<i class="fas fa-file-csv"></i> CSV'
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-sm btn-info',
+                    text: '<i class="fas fa-file-excel"></i> Excel'
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-sm btn-danger',
+                    text: '<i class="fas fa-file-pdf"></i> PDF'
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-sm btn-secondary',
+                    text: '<i class="fas fa-print"></i> Print'
+                }
+            ],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search..."
+            }
+        });
+    }
 
     // Add smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -505,7 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function() {
             const submitBtn = this.querySelector('button[type="submit"]');
-            if (submitBtn) {
+            if (submitBtn && !submitBtn.classList.contains('no-loading')) {
                 submitBtn.disabled = true;
                 const originalText = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
@@ -520,11 +590,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Add confirmation dialogs for delete actions
-    document.querySelectorAll('a[href*="delete"], button[onclick*="delete"]').forEach(element => {
+    document.querySelectorAll('a[href*="delete"], button[onclick*="delete"], .btn-danger[data-action="delete"]').forEach(element => {
         element.addEventListener('click', function(e) {
-            if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
-                e.preventDefault();
-                return false;
+            if (!this.classList.contains('no-confirm')) {
+                if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                    e.preventDefault();
+                    return false;
+                }
             }
         });
     });
@@ -537,6 +609,9 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => alert.remove(), 500);
         }, 5000);
     });
+
+    // Load notifications
+    loadNotifications();
 });
 
 // ============ UTILITY FUNCTIONS ============
@@ -549,6 +624,32 @@ function showToast(message, type = 'info') {
 function confirmDelete(message = 'Are you sure you want to delete this?') {
     return confirm(message);
 }
+
+// ============ NOTIFICATIONS LOADER ============
+function loadNotifications() {
+    fetch('/admin/api/notifications')
+        .then(response => response.json())
+        .then(notifications => {
+            if (notifications.length > 0) {
+                // Update notification badge
+                const badge = document.querySelector('.navbar-badge');
+                if (badge) {
+                    badge.textContent = notifications.length;
+                }
+                
+                // Show first notification as toast after delay
+                setTimeout(() => {
+                    if (window.toast && notifications[0]) {
+                        window.toast.show(notifications[0].message, notifications[0].type || 'info');
+                    }
+                }, 2000);
+            }
+        })
+        .catch(err => console.error('Error loading notifications:', err));
+}
+
+// Refresh notifications every 5 minutes
+setInterval(loadNotifications, 5 * 60 * 1000);
 
 // Export for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {
