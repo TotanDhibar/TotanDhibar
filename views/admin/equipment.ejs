@@ -1,0 +1,172 @@
+<%- include('layout', {
+    title: 'Equipment Management',
+    body: `
+    <!-- Equipment Management Page -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card hover-lift">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h3 class="card-title mb-0"><i class="fas fa-tools mr-2"></i> Equipment & Inventory</h3>
+                    <div class="card-tools">
+                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#addEquipmentModal">
+                            <i class="fas fa-plus"></i> Add Equipment
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filter Tabs -->
+                    <ul class="nav nav-tabs mb-3" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#all">All Equipment</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#available">Available</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#inuse">In Use</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#maintenance">Maintenance</a>
+                        </li>
+                    </ul>
+
+                    <!-- Equipment Grid -->
+                    <div class="tab-content">
+                        <div id="all" class="tab-pane fade show active">
+                            <div class="row">
+` + (equipment && equipment.length > 0 ? equipment.map(item => `
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="modern-card hover-lift">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div>
+                                                <h4 style="margin: 0; font-size: 1.1rem; font-weight: 600;">${item.name}</h4>
+                                                <small style="color: #64748b;">${item.category}</small>
+                                            </div>
+                                            <span class="badge ${item.status === 'Available' ? 'badge-status-active' : item.status === 'In Use' ? 'badge-status-pending' : 'badge-status-completed'}">${item.status}</span>
+                                        </div>
+                                        <div style="margin-bottom: 1rem;">
+                                            <p style="margin: 0.25rem 0; font-size: 0.875rem;"><strong>Model:</strong> ${item.model || 'N/A'}</p>
+                                            <p style="margin: 0.25rem 0; font-size: 0.875rem;"><strong>Serial:</strong> ${item.serial_number || 'N/A'}</p>
+                                            <p style="margin: 0.25rem 0; font-size: 0.875rem;"><strong>Location:</strong> ${item.location || 'N/A'}</p>
+                                        </div>
+                                        <div style="border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+                                            <p style="margin: 0; font-size: 0.875rem; color: #64748b;">${item.notes || 'No additional notes'}</p>
+                                        </div>
+                                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                            <button class="btn btn-sm btn-primary" style="flex: 1;">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+`).join('') : '<div class="col-12"><p class="text-center text-muted">No equipment found</p></div>') + `
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Equipment Statistics -->
+    <div class="row mt-4">
+        <div class="col-lg-3 col-6">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-boxes"></i></div>
+                <h3>${equipmentStats.total || 0}</h3>
+                <p>Total Equipment</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="stat-card success">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <h3>${equipmentStats.available || 0}</h3>
+                <p>Available</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="stat-card info">
+                <div class="stat-icon"><i class="fas fa-wrench"></i></div>
+                <h3>${equipmentStats.inUse || 0}</h3>
+                <p>In Use</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="stat-card highlight">
+                <div class="stat-icon"><i class="fas fa-tools"></i></div>
+                <h3>${equipmentStats.maintenance || 0}</h3>
+                <p>Under Maintenance</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Equipment Modal -->
+    <div class="modal fade" id="addEquipmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-plus"></i> Add New Equipment</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <form method="POST" action="/admin/equipment/add">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Equipment Name *</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select name="category" class="form-control" required>
+                                <option value="">Select Category</option>
+                                <option value="Inspection">Inspection</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Cleaning">Cleaning</option>
+                                <option value="Safety">Safety</option>
+                                <option value="Repair">Repair</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Model</label>
+                                    <input type="text" name="model" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Serial Number</label>
+                                    <input type="text" name="serial_number" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" name="location" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select name="status" class="form-control">
+                                <option value="Available">Available</option>
+                                <option value="In Use">In Use</option>
+                                <option value="Under Maintenance">Under Maintenance</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Notes</label>
+                            <textarea name="notes" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Equipment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    `
+}) %>
