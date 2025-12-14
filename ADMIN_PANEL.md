@@ -410,6 +410,22 @@ Available JavaScript utilities:
 
 ## 🆘 Troubleshooting
 
+### TinyMCE API Key Warning
+The rich text editor uses TinyMCE Cloud with a placeholder API key (`no-api-key`). For production use:
+
+**Option 1: Get a Free API Key**
+1. Sign up at https://www.tiny.cloud/
+2. Get your free API key
+3. Replace `no-api-key` in `views/admin/layout.ejs` with your actual key
+
+**Option 2: Self-Host TinyMCE**
+1. Download TinyMCE from https://www.tiny.cloud/get-tiny/self-hosted/
+2. Place files in `public/js/tinymce/`
+3. Update script source in `views/admin/layout.ejs`:
+   ```html
+   <script src="/js/tinymce/tinymce.min.js"></script>
+   ```
+
 ### Dark Mode Not Working
 - Check browser localStorage is enabled
 - Clear cache and reload
