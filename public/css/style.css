@@ -135,11 +135,20 @@ a:hover { color: #004499; }
 .service-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #0066cc, #4a9eff); transform: scaleX(0); transition: transform 0.3s; }
 .service-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
 .service-card:hover::before { transform: scaleX(1); }
-.service-icon { font-size: 3.5rem; margin-bottom: 1.5rem; display: block; }
+.service-icon { font-size: 3.5rem; margin-bottom: 1.5rem; display: block; filter: drop-shadow(0 2px 8px rgba(0,102,204,0.3)); transition: transform 0.3s ease; }
+.service-card:hover .service-icon { transform: scale(1.15) rotate(5deg); }
 .service-card h3 { color: #1e3a5f; margin-bottom: 1rem; font-size: 1.3rem; }
 .service-card p { color: #666; line-height: 1.7; }
 .learn-more { display: inline-block; margin-top: 1rem; color: #0066cc; font-weight: 600; transition: transform 0.3s; }
 .service-card:hover .learn-more { transform: translateX(5px); }
+
+/* Service Card with Background Image */
+.service-card-with-bg { position: relative; background-size: cover; background-position: center; min-height: 300px; padding: 2.5rem; display: flex; flex-direction: column; justify-content: flex-end; }
+.service-card-with-bg::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(30,58,95,0.95) 0%, rgba(30,58,95,0.7) 60%, transparent 100%); z-index: 1; transition: background 0.3s ease; }
+.service-card-with-bg:hover::after { background: linear-gradient(to top, rgba(0,102,204,0.95) 0%, rgba(0,102,204,0.7) 60%, transparent 100%); }
+.service-card-with-bg * { position: relative; z-index: 2; color: white; }
+.service-card-with-bg h3, .service-card-with-bg p, .service-card-with-bg .learn-more { color: white; }
+.service-card-with-bg .service-icon { filter: drop-shadow(0 2px 8px rgba(255,255,255,0.5)); }
 
 /* Services Grid Detailed - Large Images */
 .services-grid-detailed { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem; }
@@ -191,11 +200,15 @@ a:hover { color: #004499; }
 
 /* ===== CLIENTS SECTION ===== */
 .clients-grid, .clients-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin-top: 2rem; }
-.client-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; transition: all 0.3s ease; display: block; color: inherit; }
+.client-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; transition: all 0.3s ease; display: block; color: inherit; position: relative; overflow: hidden; }
+.client-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(0,102,204,0.05) 0%, rgba(74,158,255,0.05) 100%); opacity: 0; transition: opacity 0.3s ease; }
 .client-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
-.client-card img { max-height: 80px; width: auto; margin-bottom: 1rem; object-fit: contain; }
-.client-card h4 { color: #1e3a5f; margin: 1rem 0 0.5rem; font-size: 1rem; }
-.client-initial { width: 80px; height: 80px; background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8f 100%); color: white; font-size: 2rem; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+.client-card:hover::before { opacity: 1; }
+.client-card img { max-height: 80px; width: auto; margin-bottom: 1rem; object-fit: contain; transition: transform 0.3s ease; position: relative; z-index: 2; }
+.client-card:hover img { transform: scale(1.1); }
+.client-card h4 { color: #1e3a5f; margin: 1rem 0 0.5rem; font-size: 1rem; position: relative; z-index: 2; }
+.client-initial { width: 80px; height: 80px; background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8f 100%); color: white; font-size: 2rem; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; transition: all 0.3s ease; position: relative; z-index: 2; }
+.client-card:hover .client-initial { transform: rotate(360deg) scale(1.1); background: linear-gradient(135deg, #0066cc 0%, #4a9eff 100%); }
 
 /* Clients Grid Detailed */
 .clients-grid-detailed { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
