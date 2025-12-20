@@ -29,12 +29,42 @@
                         <% if (cert.description) { %>
                         <p><%= cert.description %></p>
                         <% } %>
-                        <% if (cert.file_path && cert.file_path.toLowerCase().endsWith('.pdf')) { %>
-                        <div class="certificate-viewer" style="margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                        
+                        <% 
+                        // Check if it's an image file
+                        const isImage = cert.file_path && (
+                            cert.file_path.toLowerCase().endsWith('.jpg') || 
+                            cert.file_path.toLowerCase().endsWith('.jpeg') || 
+                            cert.file_path.toLowerCase().endsWith('.png') || 
+                            cert.file_path.toLowerCase().endsWith('.gif') ||
+                            cert.file_path.toLowerCase().endsWith('.webp')
+                        );
+                        const isPDF = cert.file_path && cert.file_path.toLowerCase().endsWith('.pdf');
+                        %>
+                        
+                        <% if (isImage) { %>
+                        <!-- Certificate Image Preview -->
+                        <div class="certificate-preview" data-image-path="<%= cert.file_path %>" data-image-title="<%= cert.title %>">
+                            <img src="<%= cert.file_path %>" alt="<%= cert.title %>" loading="lazy">
+                            <div class="certificate-preview-overlay">
+                                <span>🔍 View Full Size</span>
+                            </div>
+                        </div>
+                        <a href="<%= cert.file_path %>" class="btn btn-primary btn-small" target="_blank" download style="margin-top: 10px;">Download Image</a>
+                        <% } else if (isPDF) { %>
+                        <!-- PDF Viewer with Controls -->
+                        <div class="certificate-viewer" style="margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; position: relative;">
+                            <div class="pdf-viewer-controls">
+                                <button class="pdf-control-btn" data-pdf-path="<%= cert.file_path %>">📂 Open</button>
+                                <a href="<%= cert.file_path %>" class="pdf-control-btn" download style="text-decoration: none; display: inline-block;">💾 Download</a>
+                            </div>
                             <iframe src="<%= cert.file_path %>" style="width: 100%; height: 600px; border: none;" title="<%= cert.title %>"></iframe>
                         </div>
+                        <% } else { %>
+                        <!-- Generic File -->
+                        <a href="<%= cert.file_path %>" class="btn btn-primary btn-small" target="_blank" download style="margin-top: 10px;">Download File</a>
                         <% } %>
-                        <a href="<%= cert.file_path %>" class="btn btn-primary btn-small" target="_blank" download>Download PDF</a>
+                        
                         <p class="upload-date">Uploaded: <%= new Date(cert.upload_date).toLocaleDateString() %></p>
                     </div>
                     <% }); %>
@@ -75,8 +105,46 @@
         <% } %>
     </main>
     
+    <!-- Lightbox Modal for Certificate Images -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+        <div class="lightbox-controls" onclick="event.stopPropagation()">
+            <button class="lightbox-btn" onclick="zoomOut()" title="Zoom Out (-)">🔍-</button>
+            <button class="lightbox-btn" onclick="resetZoom()" title="Reset (0)">↺</button>
+            <button class="lightbox-btn" onclick="zoomIn()" title="Zoom In (+)">🔍+</button>
+            <button class="lightbox-btn" onclick="rotateImage()" title="Rotate (R)">↻</button>
+        </div>
+    </div>
+    
     <%- include('../partials/footer', { contactInfo }) %>
     
     <script src="/js/main.js"></script>
+    <script>
+    // Safely handle certificate preview clicks using event delegation
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle certificate preview clicks
+        document.querySelectorAll('.certificate-preview').forEach(function(preview) {
+            preview.addEventListener('click', function() {
+                const imagePath = this.getAttribute('data-image-path');
+                const imageTitle = this.getAttribute('data-image-title');
+                if (imagePath && imageTitle) {
+                    openLightbox(imagePath, imageTitle);
+                }
+            });
+        });
+        
+        // Handle PDF open button clicks
+        document.querySelectorAll('.pdf-control-btn[data-pdf-path]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const pdfPath = this.getAttribute('data-pdf-path');
+                if (pdfPath) {
+                    window.open(pdfPath, '_blank');
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>

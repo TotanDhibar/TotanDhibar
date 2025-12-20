@@ -3,6 +3,13 @@
  * Includes animations, counters, lightbox, slideshow, and interactive features
  */
 
+// Lightbox zoom constants
+const MAX_ZOOM = 3;
+const MIN_ZOOM = 0.5;
+const ZOOM_STEP = 0.25;
+const FULL_ROTATION_DEGREES = 360;
+const ROTATION_STEP = 90;
+
 document.addEventListener('DOMContentLoaded', function() {
     
     // ===== HERO SLIDESHOW =====
@@ -365,6 +372,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ===== LIGHTBOX FUNCTIONS =====
+let lightboxZoom = 1;
+let lightboxRotation = 0;
+
 function openLightbox(imageSrc, caption) {
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
@@ -372,6 +382,10 @@ function openLightbox(imageSrc, caption) {
     
     if (lightbox && lightboxImg) {
         lightboxImg.src = imageSrc;
+        lightboxZoom = 1;
+        lightboxRotation = 0;
+        lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
+        
         if (lightboxCaption) {
             lightboxCaption.textContent = caption || '';
         }
@@ -385,13 +399,62 @@ function closeLightbox() {
     if (lightbox) {
         lightbox.classList.remove('active');
         document.body.style.overflow = '';
+        lightboxZoom = 1;
+        lightboxRotation = 0;
     }
 }
 
-// Close lightbox with Escape key
+function zoomIn() {
+    const lightboxImg = document.getElementById('lightbox-img');
+    if (lightboxImg && lightboxZoom < MAX_ZOOM) {
+        lightboxZoom += ZOOM_STEP;
+        lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
+    }
+}
+
+function zoomOut() {
+    const lightboxImg = document.getElementById('lightbox-img');
+    if (lightboxImg && lightboxZoom > MIN_ZOOM) {
+        lightboxZoom -= ZOOM_STEP;
+        lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
+    }
+}
+
+function resetZoom() {
+    const lightboxImg = document.getElementById('lightbox-img');
+    if (lightboxImg) {
+        lightboxZoom = 1;
+        lightboxRotation = 0;
+        lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
+    }
+}
+
+function rotateImage() {
+    const lightboxImg = document.getElementById('lightbox-img');
+    if (lightboxImg) {
+        lightboxRotation += ROTATION_STEP;
+        if (lightboxRotation >= FULL_ROTATION_DEGREES) lightboxRotation = 0;
+        lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
+    }
+}
+
+// Close lightbox with Escape key and handle zoom/rotate shortcuts
 document.addEventListener('keydown', function(e) {
+    const lightbox = document.getElementById('lightbox');
+    const isLightboxActive = lightbox && lightbox.classList.contains('active');
+    
+    if (!isLightboxActive) return;
+    
     if (e.key === 'Escape') {
         closeLightbox();
+    } else if (e.key === '+' || e.key === '=') {
+        zoomIn();
+    } else if (e.key === '-' || e.key === '_') {
+        zoomOut();
+    } else if (e.key === 'r' || e.key === 'R') {
+        rotateImage();
+    } else if (e.key === '0') {
+        resetZoom();
     }
 });
 
