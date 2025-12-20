@@ -411,7 +411,7 @@ router.get('/clients', requireAuth, (req, res) => {
 });
 
 router.get('/clients/add', requireAuth, (req, res) => {
-  res.render('admin/edit-client', {
+  res.render('admin/client-form', {
     title: 'Add Client',
     client: null,
     errors: [],
@@ -433,7 +433,7 @@ router.post('/clients/add',
     const errors = validationResult(req);
     
     if (!errors.isEmpty()) {
-      return res.render('admin/edit-client', {
+      return res.render('admin/client-form', {
         title: 'Add Client',
         client: req.body,
         errors: errors.array(),
@@ -456,7 +456,7 @@ router.post('/clients/add',
       res.redirect('/admin/clients');
     } catch (err) {
       console.error(err);
-      res.render('admin/edit-client', {
+      res.render('admin/client-form', {
         title: 'Add Client',
         client: req.body,
         errors: [{ msg: 'Error adding client' }],
@@ -472,7 +472,7 @@ router.get('/clients/edit/:id', requireAuth, (req, res) => {
     if (!client) {
       return res.redirect('/admin/clients');
     }
-    res.render('admin/edit-client', {
+    res.render('admin/client-form', {
       title: 'Edit Client',
       client,
       errors: [],
@@ -498,7 +498,7 @@ router.post('/clients/edit/:id',
     const errors = validationResult(req);
     
     if (!errors.isEmpty()) {
-      return res.render('admin/edit-client', {
+      return res.render('admin/client-form', {
         title: 'Edit Client',
         client: { id: req.params.id, ...req.body },
         errors: errors.array(),
@@ -525,7 +525,7 @@ router.post('/clients/edit/:id',
       stmt.run(name, slug, description || null, detailed_description || null, website || null, logo, order_index || 0, req.params.id);
 
       const updatedClient = db.prepare('SELECT * FROM clients WHERE id = ?').get(req.params.id);
-      res.render('admin/edit-client', {
+      res.render('admin/client-form', {
         title: 'Edit Client',
         client: updatedClient,
         errors: [],
@@ -533,7 +533,7 @@ router.post('/clients/edit/:id',
       });
     } catch (err) {
       console.error(err);
-      res.render('admin/edit-client', {
+      res.render('admin/client-form', {
         title: 'Edit Client',
         client: { id: req.params.id, ...req.body },
         errors: [{ msg: 'Error updating client' }],

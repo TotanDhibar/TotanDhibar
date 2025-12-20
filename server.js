@@ -54,6 +54,10 @@ const csrfProtection = csrf({ cookie: true });
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+// Disable view caching in development
+if (process.env.NODE_ENV !== 'production') {
+  app.set('view cache', false);
+}
 
 // Make user session available to all views
 app.use((req, res, next) => {

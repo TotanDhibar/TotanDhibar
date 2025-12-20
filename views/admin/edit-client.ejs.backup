@@ -1,7 +1,7 @@
 <%- include('layout', {
     title: title,
     body: `
-    <!-- Back Button -->
+    <!-- EDIT HERE: Back Button -->
     <div class="row mb-3">
         <div class="col-12">
             <a href="/admin/clients" class="btn btn-secondary">
@@ -10,11 +10,11 @@
         </div>
     </div>
     
-    <!-- Alerts Section -->
+    <!-- EDIT HERE: Alerts Section -->
     ${success ? '<div class="alert alert-success alert-dismissible"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="icon fas fa-check"></i> Client saved successfully!</div>' : ''}
     ${errors && errors.length > 0 ? '<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="icon fas fa-ban"></i><ul class="mb-0">' + errors.map(e => '<li>' + e.msg + '</li>').join('') + '</ul></div>' : ''}
     
-    <!-- Client Form Card -->
+    <!-- EDIT HERE: Client Form Card -->
     <div class="card card-success">
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-building mr-1"></i> ${client ? 'Edit' : 'Add New'} Client</h3>
@@ -24,27 +24,27 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-8">
-                        <!-- Client Name -->
+                        <!-- EDIT HERE: Client Name -->
                         <div class="form-group">
                             <label for="name"><i class="fas fa-tag mr-1"></i> Client Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" value="${client ? client.name : ''}" required placeholder="Enter client name">
                             <small class="text-muted">This will also be used to generate the URL slug</small>
                         </div>
                         
-                        <!-- Short Description -->
+                        <!-- EDIT HERE: Short Description -->
                         <div class="form-group">
                             <label for="description"><i class="fas fa-align-left mr-1"></i> Short Description</label>
                             <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description for client cards">${client ? (client.description || '') : ''}</textarea>
                         </div>
                         
-                        <!-- Detailed Description -->
+                        <!-- EDIT HERE: Detailed Description -->
                         <div class="form-group">
                             <label for="detailed_description"><i class="fas fa-file-alt mr-1"></i> Detailed Description (HTML allowed)</label>
                             <textarea class="form-control" id="detailed_description" name="detailed_description" rows="6" placeholder="Full description for the client detail page. You can use HTML tags.">${client ? (client.detailed_description || '') : ''}</textarea>
                             <small class="text-muted">This content will appear on the client detail page. You can include HTML formatting.</small>
                         </div>
                         
-                        <!-- Website URL -->
+                        <!-- EDIT HERE: Website URL -->
                         <div class="form-group">
                             <label for="website"><i class="fas fa-globe mr-1"></i> Website URL</label>
                             <input type="url" class="form-control" id="website" name="website" value="${client ? (client.website || '') : ''}" placeholder="https://www.example.com">
@@ -52,7 +52,7 @@
                     </div>
                     
                     <div class="col-md-4">
-                        <!-- Client Logo -->
+                        <!-- EDIT HERE: Client Logo -->
                         <div class="form-group">
                             <label><i class="fas fa-image mr-1"></i> Client Logo</label>
                             ${client && client.logo ? '<div class="mb-2"><img src="' + client.logo + '" alt="Current logo" class="img-thumbnail" style="max-width: 100%; background: #f8f9fa; padding: 10px;"></div>' : ''}
@@ -63,7 +63,7 @@
                             <small class="text-muted">Recommended: PNG with transparent background, 200x200px</small>
                         </div>
                         
-                        <!-- Display Order -->
+                        <!-- EDIT HERE: Display Order -->
                         <div class="form-group">
                             <label for="order_index"><i class="fas fa-sort-numeric-up mr-1"></i> Display Order</label>
                             <input type="number" class="form-control" id="order_index" name="order_index" value="${client ? client.order_index : 0}" min="0">
@@ -85,7 +85,7 @@
     `,
     extraScripts: `
     <script>
-        // Custom file input label update
+        // EDIT HERE: Custom file input label update
         document.querySelector('.custom-file-input').addEventListener('change', function(e) {
             var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file';
             e.target.nextElementSibling.textContent = fileName;
