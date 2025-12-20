@@ -44,7 +44,7 @@
                         
                         <% if (isImage) { %>
                         <!-- Certificate Image Preview -->
-                        <div class="certificate-preview" onclick="openLightbox('<%= cert.file_path %>', '<%= cert.title %>')">
+                        <div class="certificate-preview" data-image-path="<%= cert.file_path %>" data-image-title="<%= cert.title %>">
                             <img src="<%= cert.file_path %>" alt="<%= cert.title %>" loading="lazy">
                             <div class="certificate-preview-overlay">
                                 <span>🔍 View Full Size</span>
@@ -55,7 +55,7 @@
                         <!-- PDF Viewer with Controls -->
                         <div class="certificate-viewer" style="margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; position: relative;">
                             <div class="pdf-viewer-controls">
-                                <button class="pdf-control-btn" onclick="window.open('<%= cert.file_path %>', '_blank')">📂 Open</button>
+                                <button class="pdf-control-btn" data-pdf-path="<%= cert.file_path %>">📂 Open</button>
                                 <a href="<%= cert.file_path %>" class="pdf-control-btn" download style="text-decoration: none; display: inline-block;">💾 Download</a>
                             </div>
                             <iframe src="<%= cert.file_path %>" style="width: 100%; height: 600px; border: none;" title="<%= cert.title %>"></iframe>
@@ -121,5 +121,30 @@
     <%- include('../partials/footer', { contactInfo }) %>
     
     <script src="/js/main.js"></script>
+    <script>
+    // Safely handle certificate preview clicks using event delegation
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle certificate preview clicks
+        document.querySelectorAll('.certificate-preview').forEach(function(preview) {
+            preview.addEventListener('click', function() {
+                const imagePath = this.getAttribute('data-image-path');
+                const imageTitle = this.getAttribute('data-image-title');
+                if (imagePath && imageTitle) {
+                    openLightbox(imagePath, imageTitle);
+                }
+            });
+        });
+        
+        // Handle PDF open button clicks
+        document.querySelectorAll('.pdf-control-btn[data-pdf-path]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const pdfPath = this.getAttribute('data-pdf-path');
+                if (pdfPath) {
+                    window.open(pdfPath, '_blank');
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>

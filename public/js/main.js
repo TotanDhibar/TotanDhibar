@@ -3,6 +3,13 @@
  * Includes animations, counters, lightbox, slideshow, and interactive features
  */
 
+// Lightbox zoom constants
+const MAX_ZOOM = 3;
+const MIN_ZOOM = 0.5;
+const ZOOM_STEP = 0.25;
+const FULL_ROTATION_DEGREES = 360;
+const ROTATION_STEP = 90;
+
 document.addEventListener('DOMContentLoaded', function() {
     
     // ===== HERO SLIDESHOW =====
@@ -399,16 +406,16 @@ function closeLightbox() {
 
 function zoomIn() {
     const lightboxImg = document.getElementById('lightbox-img');
-    if (lightboxImg && lightboxZoom < 3) {
-        lightboxZoom += 0.25;
+    if (lightboxImg && lightboxZoom < MAX_ZOOM) {
+        lightboxZoom += ZOOM_STEP;
         lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
     }
 }
 
 function zoomOut() {
     const lightboxImg = document.getElementById('lightbox-img');
-    if (lightboxImg && lightboxZoom > 0.5) {
-        lightboxZoom -= 0.25;
+    if (lightboxImg && lightboxZoom > MIN_ZOOM) {
+        lightboxZoom -= ZOOM_STEP;
         lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
     }
 }
@@ -425,14 +432,19 @@ function resetZoom() {
 function rotateImage() {
     const lightboxImg = document.getElementById('lightbox-img');
     if (lightboxImg) {
-        lightboxRotation += 90;
-        if (lightboxRotation >= 360) lightboxRotation = 0;
+        lightboxRotation += ROTATION_STEP;
+        if (lightboxRotation >= FULL_ROTATION_DEGREES) lightboxRotation = 0;
         lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
     }
 }
 
-// Close lightbox with Escape key
+// Close lightbox with Escape key and handle zoom/rotate shortcuts
 document.addEventListener('keydown', function(e) {
+    const lightbox = document.getElementById('lightbox');
+    const isLightboxActive = lightbox && lightbox.classList.contains('active');
+    
+    if (!isLightboxActive) return;
+    
     if (e.key === 'Escape') {
         closeLightbox();
     } else if (e.key === '+' || e.key === '=') {
