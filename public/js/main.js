@@ -365,6 +365,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ===== LIGHTBOX FUNCTIONS =====
+let lightboxZoom = 1;
+let lightboxRotation = 0;
+
 function openLightbox(imageSrc, caption) {
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
@@ -372,6 +375,10 @@ function openLightbox(imageSrc, caption) {
     
     if (lightbox && lightboxImg) {
         lightboxImg.src = imageSrc;
+        lightboxZoom = 1;
+        lightboxRotation = 0;
+        lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
+        
         if (lightboxCaption) {
             lightboxCaption.textContent = caption || '';
         }
@@ -385,6 +392,42 @@ function closeLightbox() {
     if (lightbox) {
         lightbox.classList.remove('active');
         document.body.style.overflow = '';
+        lightboxZoom = 1;
+        lightboxRotation = 0;
+    }
+}
+
+function zoomIn() {
+    const lightboxImg = document.getElementById('lightbox-img');
+    if (lightboxImg && lightboxZoom < 3) {
+        lightboxZoom += 0.25;
+        lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
+    }
+}
+
+function zoomOut() {
+    const lightboxImg = document.getElementById('lightbox-img');
+    if (lightboxImg && lightboxZoom > 0.5) {
+        lightboxZoom -= 0.25;
+        lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
+    }
+}
+
+function resetZoom() {
+    const lightboxImg = document.getElementById('lightbox-img');
+    if (lightboxImg) {
+        lightboxZoom = 1;
+        lightboxRotation = 0;
+        lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
+    }
+}
+
+function rotateImage() {
+    const lightboxImg = document.getElementById('lightbox-img');
+    if (lightboxImg) {
+        lightboxRotation += 90;
+        if (lightboxRotation >= 360) lightboxRotation = 0;
+        lightboxImg.style.transform = `scale(${lightboxZoom}) rotate(${lightboxRotation}deg)`;
     }
 }
 
@@ -392,6 +435,14 @@ function closeLightbox() {
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeLightbox();
+    } else if (e.key === '+' || e.key === '=') {
+        zoomIn();
+    } else if (e.key === '-' || e.key === '_') {
+        zoomOut();
+    } else if (e.key === 'r' || e.key === 'R') {
+        rotateImage();
+    } else if (e.key === '0') {
+        resetZoom();
     }
 });
 

@@ -115,8 +115,14 @@
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox" onclick="closeLightbox()">
         <span class="lightbox-close">&times;</span>
-        <img id="lightbox-img" src="" alt="">
+        <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
         <div id="lightbox-caption" class="lightbox-caption"></div>
+        <div class="lightbox-controls" onclick="event.stopPropagation()">
+            <button class="lightbox-btn" onclick="zoomOut()" title="Zoom Out (-)">🔍-</button>
+            <button class="lightbox-btn" onclick="resetZoom()" title="Reset (0)">↺</button>
+            <button class="lightbox-btn" onclick="zoomIn()" title="Zoom In (+)">🔍+</button>
+            <button class="lightbox-btn" onclick="rotateImage()" title="Rotate (R)">↻</button>
+        </div>
     </div>
     
     <%- include('../partials/footer', { contactInfo }) %>
